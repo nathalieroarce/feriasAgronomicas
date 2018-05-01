@@ -15,11 +15,11 @@ const bd = new BD({
     ssl: true
 });
 
-app.get('/sp_getProductsByEnterpriseID', async (req, res) => {
+app.get('/getProductsByEnterpriseID', async (req, res) => {
     try {
         const client = await bd.connect()
-        const result = await client.query('select p_getProductsByEnterpriseID(1)');
-      //  res.render('View/example', result);
+        const result = await client.query('select sp_getProductsByEnterpriseID(1)');
+        res.render('View/prueba', result);
         return result;
         //client.release();
     } catch (err) {
