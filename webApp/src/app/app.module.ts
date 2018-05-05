@@ -10,10 +10,13 @@ import { FormsModule } from '@angular/forms';
 
 import { AgmCoreModule } from '@agm/core';
 
+import { HttpModule } from '@angular/http';
+
+import { HttpClient, HttpClientModule } from '@angular/common/http';
+
 import { Routes, RouterModule } from '@angular/router';
 
-//import globals vars
-import * as globalsVars from '../../globals';
+
 
 //here is necesary to set all module routes
 const routes: Routes = [
@@ -30,9 +33,10 @@ const routerModule = RouterModule.forRoot(routes);
     BrowserModule,
     CommonModule,
     routerModule,
-    AgmCoreModule.forRoot({
-      apiKey:  globalsVars.api_key
-    })
+    FormsModule,
+    HttpModule,
+    HttpClientModule,
+    
     
   ],
   providers: [],

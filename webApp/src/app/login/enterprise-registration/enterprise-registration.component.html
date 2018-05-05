@@ -66,14 +66,14 @@
                 </div>
   
                 <div class="form-group">
-                    <label><input type="checkbox" class="fomr-control" value="">
+                    <label><input type="checkbox" class="fomr-control"  value="">
                       Ofrece servicio express </label>
                     
                 </div>
 
                    <!-- ng*If , only display if the enterprise offers express service  -->
   
-                <div class="form-group">
+                <div *ngIf="enterpriseObject.getExpressService()=== true" class="form-group">
                     <label for="price">Cobro por kilómetro: </label>
                     <input type="number" class="form-control" id="price">
                     

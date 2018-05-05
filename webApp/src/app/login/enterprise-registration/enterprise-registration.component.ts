@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
+import {enterpriseRegistrationModel} from '../../models/login/enterpriseRegistrationModel';
+
 @Component({
   selector: 'app-enterprise-registration',
   templateUrl: './enterprise-registration.component.html',
@@ -7,10 +9,12 @@ import { Component, OnInit } from '@angular/core';
 })
 export class EnterpriseRegistrationComponent implements OnInit {
 
+  private enterpriseObject: enterpriseRegistrationModel;
   private lat: number;
   private lng: number;
 
   constructor() { 
+    this.enterpriseObject= new enterpriseRegistrationModel();
     this.setCurrentPosition();
   }
 
