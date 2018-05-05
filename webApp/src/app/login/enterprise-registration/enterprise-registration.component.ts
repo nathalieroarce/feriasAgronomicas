@@ -1,20 +1,19 @@
-import { Component } from '@angular/core';
-
+import { Component, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  selector: 'app-enterprise-registration',
+  templateUrl: './enterprise-registration.component.html',
+  styleUrls: ['./enterprise-registration.component.css']
 })
-export class AppComponent {
-  
-  private title: string = 'My first AGM project';
+export class EnterpriseRegistrationComponent implements OnInit {
+
   private lat: number;
   private lng: number;
 
-  constructor(){
+  constructor() { 
     this.setCurrentPosition();
   }
+
 
   //get user current position
   public setCurrentPosition(){
@@ -32,6 +31,7 @@ export class AppComponent {
       
   }
 
-
+  ngOnInit() {
+  }
 
 }
