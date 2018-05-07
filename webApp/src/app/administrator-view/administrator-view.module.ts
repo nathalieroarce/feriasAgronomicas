@@ -5,6 +5,7 @@ import { ProductsRegistrationComponent } from './products-registration/products-
 import { Routes, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MainViewComponent } from './main-view/main-view.component';
+import { ProductsManagementService } from '../services/administrador-view/products-management.service';
 
 const routes: Routes = [
   { path: '', component: MainViewComponent},
@@ -17,6 +18,7 @@ const routes: Routes = [
     FormsModule,
     RouterModule.forChild(routes),
   ],
-  declarations: [ProductsRegistrationComponent, MainViewComponent]
+  declarations: [ProductsRegistrationComponent, MainViewComponent],
+  providers: [ProductsManagementService]
 })
 export class AdministratorViewModule { }

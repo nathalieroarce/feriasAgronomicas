@@ -6,6 +6,7 @@ import { EnterpriseRegistrationComponent } from './enterprise-registration/enter
 import { AgmCoreModule } from '@agm/core';
 //import globals vars
 import * as globalsVars from '../../../globals';
+import { FormsModule } from '@angular/forms';
 
 
 const routes: Routes = [
@@ -16,6 +17,7 @@ const routes: Routes = [
 @NgModule({
   imports: [
     CommonModule,
+    FormsModule,
     RouterModule.forChild(routes),
     AgmCoreModule.forRoot({
       apiKey:  globalsVars.api_key

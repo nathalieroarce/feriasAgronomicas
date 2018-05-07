@@ -12,8 +12,10 @@ export class EnterpriseRegistrationComponent implements OnInit {
   private enterpriseObject: enterpriseRegistrationModel;
   private lat: number;
   private lng: number;
+  private provideExpress:Boolean;
 
   constructor() { 
+    this.provideExpress=false;
     this.enterpriseObject= new enterpriseRegistrationModel();
     this.setCurrentPosition();
   }

@@ -1,4 +1,4 @@
-/***********************************************************
+﻿/***********************************************************
 DOMAINS
 ************************************************************/
 
@@ -14,6 +14,8 @@ CHK_t_phone CHECK (VALUE SIMILAR TO '[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]')
 /***********************************************************
 TABLES
 ************************************************************/
+
+drop table enterprises
 CREATE TABLE enterprises
 ( 
 	enterpriseID SERIAL NOT NULL,
@@ -39,6 +41,7 @@ CREATE TABLE productTypes
    CONSTRAINT productTypes_PK_typeID PRIMARY KEY (typeID)
 )
 
+drop table productTypes
 CREATE TABLE products
 ( 
    productID serial NOT NULL,
@@ -61,9 +64,32 @@ CREATE TABLE products
 STORED PROCDEDURES
 ******************************************************************/
 
+
+/***********************
+For table productTypes
+************************/
+
+CREATE OR REPLACE FUNCTION sp_getProductTypes
+(
+    OUT o_productTypeID INTEGER,
+    OUT o_productTypeName VARCHAR(20)
+
+)
+RETURNS
+SETOF RECORD AS
+$body$
+BEGIN
+	RETURN query SELECT  * FROM productTypes;
+
+
+END;
+$body$
+LANGUAGE plpgsql;
 /***********************
 For table enterprises
 ************************/
+
+drop function sp_insertEntrprise(varchar,text,varchar,varchar,varchar,varchar,boolean,MONEY,POINT,POINT)
 
 -- Insert an enterprise 
 -- Require: None
@@ -73,13 +99,13 @@ CREATE OR REPLACE FUNCTION sp_insertEnterprise
 	IN i_enterpriseName VARCHAR(50),
 	IN i_description TEXT, 
 	IN i_nameRepresentative VARCHAR(30),
-	IN i_representativeCard VARCHAR(11),
-	IN i_mail t_mail,
-	IN i_telephone t_phone,
-	IN i_expressService BOOLEAN
+	IN i_representativeCard CHAR(11),
+	IN i_mail VARCHAR(50),
+	IN i_telephone VARCHAR(9),
+	IN i_expressService BOOLEAN,
 	IN i_chargePerKilometer MONEY,
-	IN i_pointDeliveryOrders POINT,
-	IN i_enterpriseLocation POINT,
+	IN i_pointDeliveryOrders geometry,
+	IN i_enterpriseLocation geometry
 )
 RETURNS
 BOOLEAN AS
@@ -88,7 +114,7 @@ BEGIN
 	INSERT INTO enterprises (enterpriseName, description, nameRepresentative, representativeCard, mail, telephone, expressService, chargePerKilometer, pointDeliveryOrders, enterpriseLocation) 
 	VALUES (i_enterpriseName, i_description, i_nameRepresentative, i_representativeCard, i_mail, i_telephone, i_expressService, i_chargePerKilometer, i_pointDeliveryOrders, i_enterpriseLocation);
 	RETURN TRUE;
-	EXCEPTION WHEN OTHERS THEN RETURN FALSE;
+	--EXCEPTION WHEN OTHERS THEN RETURN FALSE;
 
 END;
 $body$
@@ -103,7 +129,7 @@ For table products
 -- Restrictions: The name is unique so it must not be registered
 CREATE OR REPLACE FUNCTION sp_insertProduct
 (
-	IN i_enterpriseID INTEGER,
+    IN i_enterpriseID INTEGER,
     IN i_productName TEXT,
     IN i_code VARCHAR(20),
     IN i_price MONEY,
@@ -117,7 +143,7 @@ RETURNS
 BOOLEAN AS
 $body$
 BEGIN
-	INSERT INTO products (enterpriseID, productName, code, price, unit, image, productType, descriptio, stock) 
+	INSERT INTO products (enterpriseID, productName, code, price, unit, image, productType, description, stock) 
 	VALUES (i_enterpriseID, i_productName, i_code, i_price, i_unit, i_image, i_productType, i_description, i_stock);
 	RETURN TRUE;
 	EXCEPTION WHEN OTHERS THEN RETURN FALSE;
@@ -154,10 +180,21 @@ END;
 $body$
 LANGUAGE plpgsql;
 
-select sp_insertEnterprise('Empresa1', 'descripcion', 'Josua Carranza', '1-1232-1113', 'se@gmail.com','2343-4242', false, (0::money), (SELECT ST_SetSRID(ST_MakePoint(-71.1043443253471, 42.3150676015829),4326)), (SELECT ST_SetSRID(ST_MakePoint(-71.1043443253471, 42.3150676015829),4326)))
+select sp_insertEnterprise('Empresa1', 'descripcion', 'Josua Carranza', '1-1232-1113', 'se@gmail.com','2343-4242', false, (0::MONEY), (SELECT ST_SetSRID(ST_MakePoint(-71.1043443253471, 42.3150676015829),4326)), (SELECT ST_SetSRID(ST_MakePoint(-71.1043443253471, 42.3150676015829),4326)))
 
-select sp_insertProduct(3,'Piña','00rt',600,'U','manzanatestimage.png',1,'Piña del atlántico',10)
+select sp_insertProduct(3,'Piña','00rt',(600::money),'U','manzanatestimage.png',1,'Piña del atlántico',10)
 
+
+
+select * from products
+select * from enterprises
+--insert enterprise
+INSERT INTO enterprises (enterpriseName, description, nameRepresentative, representativeCard, mail, telephone, 
+			expressService, chargePerKilometer) values
+			('Empresa prueba','nada','alguien','1-2345-5445','empresa@gmail.com','3434-3434',true,(1000::MONEY))
+
+
+insert into productTypes(typeName) values ('Frutas'),('Legumbres'),('Vegetales')
 /*
 insert into productTypes(typeName) values ('Frutas')
 select * from productTypes
