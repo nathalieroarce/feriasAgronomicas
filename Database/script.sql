@@ -1,7 +1,6 @@
-﻿/***********************************************************
+/***********************************************************
 DOMAINS
 ************************************************************/
-
 CREATE DOMAIN t_unit CHAR(1) NOT NULL CONSTRAINT
 CHK_t_unit CHECK (VALUE IN ('U','K','B'));
 
@@ -11,29 +10,33 @@ CHK_t_mail CHECK (VALUE SIMILAR TO '[A-z]%@[A-z]%.[A-z]%');
 CREATE DOMAIN t_phone VARCHAR(9) NOT NULL CONSTRAINT
 CHK_t_phone CHECK (VALUE SIMILAR TO '[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]');
 
+CREATE DOMAIN t_card VARCHAR(11) NOT NULL CONSTRAINT
+CHK_t_phone CHECK (VALUE SIMILAR TO '[0-9]-[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]');
+
 /***********************************************************
 TABLES
 ************************************************************/
-
-drop table enterprises
+DROP TABLE enterprises
 CREATE TABLE enterprises
 ( 
 	enterpriseID SERIAL NOT NULL,
 	enterpriseName VARCHAR(50) NOT NULL UNIQUE,
+	logo TEXT NOT NULL,
 	description TEXT NOT NULL, 
 	nameRepresentative VARCHAR(30) NOT NULL,
-	representativeCard VARCHAR(11) NOT NULL,
+	representativeCard t_card NOT NULL,
 	mail t_mail NOT NULL,
+	e_password VARCHAR(10) NOT NULL,
 	telephone t_phone NOT NULL,
 	expressService BOOLEAN NOT NULL DEFAULT FALSE,
 	chargePerKilometer MONEY NOT NULL DEFAULT 0,
-	
+	locationName VARCHAR(50) NOT NULL,		
 	CONSTRAINT enterprise_PK_enterpriseID PRIMARY KEY (enterpriseID)
 );
+SELECT AddGeometryColumn('public','enterprises','pointdeliveryorders', 4326, 'POINT',2);
+SELECT AddGeometryColumn('public','enterprises','enterpriselocation', 4326, 'POINT',2);
 
-SELECT AddGeometryColumn('public','enterprises','pointDeliveryOrders', 4326, 'POINT',2)
-SELECT AddGeometryColumn('public','enterprises','enterpriseLocation', 4326, 'POINT',2)
-
+DROP TABLE productTypes
 CREATE TABLE productTypes
 (
    typeID serial NOT NULL UNIQUE,
@@ -41,7 +44,7 @@ CREATE TABLE productTypes
    CONSTRAINT productTypes_PK_typeID PRIMARY KEY (typeID)
 )
 
-drop table productTypes
+DROP TABLE products
 CREATE TABLE products
 ( 
    productID serial NOT NULL,
@@ -54,7 +57,6 @@ CREATE TABLE products
    productType INTEGER NOT NULL,
    description TEXT NOT NULL,
    stock INTEGER NOT NULL,
-
    CONSTRAINT products_PK_productID PRIMARY KEY (productID),
    CONSTRAINT products_FK_enterpriseID FOREIGN KEY (enterpriseID) REFERENCES enterprises(enterpriseID) ON DELETE CASCADE ON UPDATE CASCADE,
    CONSTRAINT products_FK_productType FOREIGN KEY (productType) REFERENCES productTypes(typeID) ON DELETE CASCADE ON UPDATE CASCADE
@@ -64,11 +66,12 @@ CREATE TABLE products
 STORED PROCDEDURES
 ******************************************************************/
 
-
 /***********************
 For table productTypes
 ************************/
-
+-- Insert a product type 
+-- Require: None
+-- Restrictions: The name is unique so it must not be registered
 CREATE OR REPLACE FUNCTION sp_getProductTypes
 (
     OUT o_productTypeID INTEGER,
@@ -80,42 +83,45 @@ SETOF RECORD AS
 $body$
 BEGIN
 	RETURN query SELECT  * FROM productTypes;
-
-
 END;
 $body$
 LANGUAGE plpgsql;
+
 /***********************
 For table enterprises
 ************************/
-
-drop function sp_insertEntrprise(varchar,text,varchar,varchar,varchar,varchar,boolean,MONEY,POINT,POINT)
-
 -- Insert an enterprise 
 -- Require: None
 -- Restrictions: The name is unique so it must not be registered
 CREATE OR REPLACE FUNCTION sp_insertEnterprise
 (
 	IN i_enterpriseName VARCHAR(50),
+	IN i_logo TEXT,
 	IN i_description TEXT, 
 	IN i_nameRepresentative VARCHAR(30),
-	IN i_representativeCard CHAR(11),
-	IN i_mail VARCHAR(50),
-	IN i_telephone VARCHAR(9),
+	IN i_representativeCard t_card,
+	IN i_mail t_mail,
+	IN i_password VARCHAR(10),
+	IN i_telephone t_phone,
 	IN i_expressService BOOLEAN,
-	IN i_chargePerKilometer MONEY,
-	IN i_pointDeliveryOrders geometry,
-	IN i_enterpriseLocation geometry
+	IN i_chargePerKilometer INTEGER,
+	IN i_locationName VARCHAR(50),
+	IN i_pointDeliveryOrders TEXT,
+	IN i_enterpriseLocation TEXT
 )
 RETURNS
 BOOLEAN AS
 $body$
 BEGIN
-	INSERT INTO enterprises (enterpriseName, description, nameRepresentative, representativeCard, mail, telephone, expressService, chargePerKilometer, pointDeliveryOrders, enterpriseLocation) 
-	VALUES (i_enterpriseName, i_description, i_nameRepresentative, i_representativeCard, i_mail, i_telephone, i_expressService, i_chargePerKilometer, i_pointDeliveryOrders, i_enterpriseLocation);
+	INSERT INTO enterprises (enterpriseName, logo, description, nameRepresentative, representativeCard, 
+			mail, e_password, telephone, expressService, chargePerKilometer, locationName, 
+			pointdeliveryorders, enterpriselocation) VALUES 
+			(i_enterpriseName, i_logo, i_description, i_nameRepresentative, i_representativeCard, i_mail, i_password, 
+	 		i_telephone, i_expressService, (i_chargePerKilometer::MONEY), i_locationName, 
+			ST_GeomFromText(i_pointDeliveryOrders, 4326),
+			ST_GeomFromText(i_enterpriseLocation, 4326));
 	RETURN TRUE;
-	--EXCEPTION WHEN OTHERS THEN RETURN FALSE;
-
+	EXCEPTION WHEN OTHERS THEN RETURN FALSE;
 END;
 $body$
 LANGUAGE plpgsql;
@@ -123,7 +129,6 @@ LANGUAGE plpgsql;
 /***********************
 For table products
 ************************/
-
 -- Insert a product
 -- Require: None
 -- Restrictions: The name is unique so it must not be registered
@@ -132,7 +137,7 @@ CREATE OR REPLACE FUNCTION sp_insertProduct
     IN i_enterpriseID INTEGER,
     IN i_productName TEXT,
     IN i_code VARCHAR(20),
-    IN i_price MONEY,
+    IN i_price INTEGER,
     IN i_unit  t_unit,
     IN i_image TEXT,
     IN i_productType INTEGER,
@@ -144,7 +149,7 @@ BOOLEAN AS
 $body$
 BEGIN
 	INSERT INTO products (enterpriseID, productName, code, price, unit, image, productType, description, stock) 
-	VALUES (i_enterpriseID, i_productName, i_code, i_price, i_unit, i_image, i_productType, i_description, i_stock);
+	VALUES (i_enterpriseID, i_productName, i_code, (i_price::MONEY), i_unit, i_image, i_productType, i_description, i_stock);
 	RETURN TRUE;
 	EXCEPTION WHEN OTHERS THEN RETURN FALSE;
 
@@ -161,7 +166,7 @@ CREATE OR REPLACE FUNCTION sp_getProductsByEnterpriseID
 	OUT o_enterpriseID INTEGER,
 	OUT o_productID INTEGER,
 	OUT o_productName TEXT,
-	OUT o_price MONEY,
+	OUT o_price INTEGER,
 	OUT o_productImage TEXT,
 	OUT o_productUnit t_unit,
 	OUT o_productDescription TEXT,
@@ -173,34 +178,29 @@ SETOF RECORD AS
 $body$
 BEGIN
 	RETURN query SELECT p.* FROM
-	(SELECT enterpriseID,productID, productName, price,image,unit,description,stock  FROM products WHERE enterpriseID=i_enterpriseID) AS p 
+	(SELECT enterpriseID,productID, productName, (price::MONEY::NUMERIC::INTEGER),image,unit,description,stock  FROM products WHERE enterpriseID=i_enterpriseID) AS p 
 	 WHERE p.stock > 0;
 
 END;
 $body$
 LANGUAGE plpgsql;
 
-select sp_insertEnterprise('Empresa1', 'descripcion', 'Josua Carranza', '1-1232-1113', 'se@gmail.com','2343-4242', false, (0::MONEY), (SELECT ST_SetSRID(ST_MakePoint(-71.1043443253471, 42.3150676015829),4326)), (SELECT ST_SetSRID(ST_MakePoint(-71.1043443253471, 42.3150676015829),4326)))
+/*Prueba:
 
-select sp_insertProduct(3,'Piña','00rt',(600::money),'U','manzanatestimage.png',1,'Piña del atlántico',10)
+select sp_insertEnterprise('Empresa1', 'logo', 'descripcion', 'Josua Carranza', '1-1232-1113', 
+						   'se@gmail.com', '112dydfe64', '2343-4242', false, 0, 'lugar', 
+						   'POINT(-71.060316 48.432044)', 'POINT(-71.060316 48.432044)');
+						   
+insert into productTypes(typeName) values ('Frutas'),('Legumbres'),('Vegetales');
 
+select sp_insertProduct(1,'Piña','00rt',600,'U','manzanatestimage.png',1,'Piña del atlántico',10)
 
-
-select * from products
-select * from enterprises
---insert enterprise
-INSERT INTO enterprises (enterpriseName, description, nameRepresentative, representativeCard, mail, telephone, 
-			expressService, chargePerKilometer) values
-			('Empresa prueba','nada','alguien','1-2345-5445','empresa@gmail.com','3434-3434',true,(1000::MONEY))
-
-
-insert into productTypes(typeName) values ('Frutas'),('Legumbres'),('Vegetales')
-/*
-insert into productTypes(typeName) values ('Frutas')
-select * from productTypes
-delete from productTypes
-drop table products
-select * from products
+INSERT INTO enterprises (enterpriseName, logo, description, nameRepresentative, representativeCard, 
+			mail, e_password, telephone, expressService, chargePerKilometer, locationName, 
+			 pointdeliveryorders, enterpriselocation) values
+			('Empresa prueba','logo','nada','alguien','1-2345-5445','empresa@gmail.com',
+			 'gdsg53574f','3434-3434',true,(1000::MONEY),'lugar', ST_GeomFromText('POINT(-71.060316 48.432044)', 4326),
+			ST_GeomFromText('POINT(-71.060316 48.432044)', 4326))
 
 insert into products(
    enterpriseID ,
@@ -218,5 +218,4 @@ insert into products(
   (2,'Mango','00rt',600,'B','manzanatestimage.png',1,'mango del atlántico',0),
   (2,'Naranja','00rt',600,'U','manzanatestimage.png',1,'Naranja del atlántico',30),
   (3,'Piña','00rt',600,'U','manzanatestimage.png',1,'Piña del atlántico',10);
-
-select sp_getProductsByEnterpriseID(3);*/
+*/
