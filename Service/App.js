@@ -28,7 +28,7 @@ const storageMulter = multer.diskStorage({
   limits:limits
   ,
   filename: function (req, file, cb) {
-  
+
     cb(null, Date.now()+ file.originalname + path.extname(file.originalname));
   }
 });
@@ -75,7 +75,7 @@ function uploadToService(fileInformation,toBucket,callback){
 				let localFileLocation = folderDirection +fileInformation.filename;
 				myBucket.uploadAsync(localFileLocation, { public: true },function(err, file){
 
-					if (err){ 
+					if (err){
 						//error ocurred
 			    		callback({response: false, imageUrl:serviceUrl+BUCKET_NAME+"/"+fileInformation.filename});
 					}
@@ -123,6 +123,8 @@ const bd = new BD({
     ssl: true
 });
 
+
+
 app.get('/getProductsByEnterpriseID', async (req, res) => {
     try {
         const client = await bd.connect()
@@ -153,7 +155,7 @@ app.get('/getProductsTypes', async (req, res) => {
 
 app.post('/registerProduct',function(req,res)
 {
-	console.log("registrar Producto");	
+	console.log("registrar Producto");
 	upload(req,res, function (err) {
         if (err) {
             res.end(JSON.stringify({response:false,message: "El proceso de cargo de la imagen no fue exitoso"}));
@@ -165,7 +167,7 @@ app.post('/registerProduct',function(req,res)
         		uploadToService(req.file,productsBucketName,function(response){
         				if (response.response===true){
         					//execute the store procedure
-        					
+
         					//1 is an enterprise
         					db.func('sp_insertProduct',[req.body.enterpriseID,req.body.name,req.body.code,req.body.price,req.body.unit,response.imageUrl,
         										req.body.productType, req.body.description, req.body.stock])
@@ -185,14 +187,14 @@ app.post('/registerProduct',function(req,res)
         				}
 
         				deleteImageFromLocal(folderDirection+"/"+ req.file.filename);
-        		
-        		})        		
-					
+
+        		})
+
         	  }
-			
+
 			else{
 				res.end(JSON.stringify({response:false,message: "El proceso de carga de la imagen no fue existoso"}));
-					
+
 			}
 		}
 
