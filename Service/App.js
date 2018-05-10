@@ -1,10 +1,42 @@
 
 var pg = require('pg');
-var conString = "postgres://postgres:12345@localhost:5432/devesa_app";
+var conString = "postgres://postgres:12345@localhost:5432/agriculturalfairs";
+var client;
+var fs = require('fs');
 var express = require('express');
 var app = express();
+var path = require('path');
+var bodyParser = require('body-parser');
+var Promise = require('bluebird');
+var GoogleCloudStorage = Promise.promisifyAll(require('@google-cloud/storage'));
+var multer = require("multer");
+var limits = { fileSize: 50 * 1024 * 1024 };
+
+var productsBucketName='feriasagronomicasproductos';
+
+var enterpriseBucketName='feriasagronomicasempresas';
+
+var folderDirection= "./TemporalImages/";
+
+var serviceUrl="https://storage.googleapis.com/";
+
+
+const storageMulter = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, './TemporalImages');
+  },
+  limits:limits
+  ,
+  filename: function (req, file, cb) {
+
+    cb(null, Date.now()+ file.originalname + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ storage: storageMulter }).single('image');
+
 var pgp = require('pg-promise')();
-var cn = {host: "", port: 5432, database: 'agriculturalFairs', user: 'postgres', password: 'postgresql2017'};
+var cn = {host: 'localhost', port: 5432, database: 'agriculturalfairs', user: 'postgres', password: '12345'};
 var db = pgp(cn);
 
 app.use(function(req, res, next) {
@@ -15,38 +47,63 @@ app.use(function(req, res, next) {
 });
 
 
-app.get('/getProductsByEnterpriseID', function(req,res)
-{    
-    db.func('sp_getProductsByEnterpriseID', [req.query.id])
-    .then(data => {res.end(JSON.stringify(data.sp_crearinforme));})
-    .catch(error=> { res.status(400).send({message:0});})
-});
 
-app.post('/registerProduct', function(req,res)
-{
-    db.func('', [req.query.id])
-    .then(data => {res.end(JSON.stringify(data.sp_crearinforme));})
-    .catch(error=> { res.status(400).send({message:0});})
-});
-
-app.post('/registerEntity', function(req,res)
-{
-    db.func('', [req.query.id])
-    .then(data => {res.end(JSON.stringify(data.sp_crearinforme));})
-    .catch(error=> { res.status(400).send({message:0});})
-});
+app.use(bodyParser.json({limit: '50mb'}));
+//support parsing of application/x-www-form-urlencoded post data
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true, parameterLimit:50000 }));
 
 
-
-var server = app.listen(8081, function ()
-{
-	var host = server.address().address;
-	var port = server.address().port;
-  console.log(" app listening at http://%s:%s", host, port);
-});
+var storage = GoogleCloudStorage({
+  projectId: '57822770845ad25617586e7afc5bab6054b3bccf',
+  keyFilename: './feriasAgronomicas-key.json'
+})
 
 
-/*
+/******************************************************************
+
+FUNCTION TO UPLOAD IMAGE
+
+*******************************************************************/
+function uploadToService(fileInformation,toBucket,callback){
+				var BUCKET_NAME = toBucket;
+				var myBucket = storage.bucket(BUCKET_NAME);
+
+				var file = myBucket.file(fileInformation.filename);
+
+				let localFileLocation = folderDirection +fileInformation.filename;
+				myBucket.uploadAsync(localFileLocation, { public: true },function(err, file){
+
+					if (err){
+						//error ocurred
+			    		callback({response: false, imageUrl:serviceUrl+BUCKET_NAME+"/"+fileInformation.filename});
+					}
+					else{
+						//aqui va el procedimiento almacenado
+						//file saved
+
+						callback({response: true, imageUrl:serviceUrl+BUCKET_NAME+"/"+fileInformation.filename});
+					}
+
+				});
+}
+
+
+function deleteImageFromLocal(imageUrl){
+	//remove local image
+    fs.unlink(imageUrl, (err) => {
+         if (err) {
+             throw err;
+             console.log('error for deleted from local');
+             }
+         else{
+             console.log('successfully deleted from local');
+             }
+       });
+}
+
+
+
+/************************************************
 const express = require('express')
 const path = require('path')
 const http =  require('http');
@@ -79,4 +136,95 @@ app.get('/getProductsByEnterpriseID', async (req, res) => {
     }
 });
 
+app.get('/getProductsTypes', async (req, res) => {
+    try {
+        const client = await bd.connect()
+        const result = await client.query('select sp_getProductsByEnterpriseID(1)');
+        res.render('View/prueba', result);
+        return result;
+        //client.release();
+    } catch (err) {
+        console.error(err);
+        res.send("Error " + err);
+    }
+});
+
 */
+
+app.post('/registerProduct',function(req,res)
+{
+	console.log("registrar Producto");
+	upload(req,res, function (err) {
+        if (err) {
+        	console.log(err);
+            res.end(JSON.stringify({response:false,message: "El proceso de cargo de la imagen no fue exitoso"}));
+        }
+        else{
+        	console.log(req.body.name);
+        	console.log(req.body);
+        	console.log("¡¡¡¡¡ Nombre del archivo imagen !!!!!!!!!!!!!!!");
+        	console.log(req.file.filename);
+        	console.log("nombre de usuario especificado");
+        	console.log(req.body.name);
+        	console.log(req.body.price);
+        	if (req.file) {
+        		//upload image to service
+        		uploadToService(req.file,productsBucketName,function(response){
+        				if (response.response===true){
+        					//execute the store procedure
+
+        					//1 is an enterprise
+        					db.func('sp_insertProduct',[1,req.body.name,req.body.code,req.body.price,req.body.unit,response.imageUrl,
+        										req.body.productType, req.body.description, req.body.stock])
+									.then(data => {
+										console.log(data);
+										res.end(JSON.stringify({"response" :data.sp_insertproduct}));
+									})
+		    						.catch(error=> {
+		            					console.log("ERROR: ",error);
+		        						res.end(JSON.stringify({ response:false,"data":[]}));
+    										})
+
+        				}
+
+        				else{
+        					res.end(JSON.stringify({response:false,message: "El proceso de carga de la imagen no fue existoso"}));
+        				}
+
+        				deleteImageFromLocal(folderDirection+"/"+ req.file.filename);
+
+        		})
+
+        	  }
+
+			else{
+				res.end(JSON.stringify({response:false,message: "El proceso de carga de la imagen no fue existoso"}));
+
+			}
+		}
+
+    });
+
+    });
+
+app.get('/getProductTypes',function(req,res)
+{
+	db.func('sp_getProductTypes')
+		.then(data => {
+			console.log(data);
+			res.end(JSON.stringify({response:true, "data": data } ) );
+			})
+		  .catch(error=> {
+		    console.log("ERROR: ",error);
+		    res.end(JSON.stringify({ response:false,"data":[]}));})
+
+});
+
+
+
+var server = app.listen(8081, function ()
+{
+	var host = server.address().address;
+	var port = server.address().port;
+  console.log("Example app listening at http://%s:%s", host, port);
+});

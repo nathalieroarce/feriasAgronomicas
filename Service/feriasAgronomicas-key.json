@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "feriasagronomicas",
+  "private_key_id": "57822770845ad25617586e7afc5bab6054b3bccf",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDKYuoth2BaLKku\nK0yz2dqbftT9IURmtR5RGilDJXQQParc9hWeZyYjxrTVJ1uTaZuMcnlEaBm1xOq2\nC381Z50H2+7Dc0guSTpG4DfvyYJh+wfSYX19WvdLS8SrpMpxobX73oI9kkRZssWI\nIkQTmRHfZ1ZgCksB02HvFemwvWzXxT5zy+KNeqqu9Spsca96aNgu2udQCkrV1aMd\nROvqAH+3JQc0XMc0GSeuIwSMCUh8wP3xAiURDGvjtnjW17jnWwhGzg5yrEv4CBPd\nnV5ijl9r9u0CqJtMC2inrl3YGFEwwmvcZpTDq2kXrD/RFbIpj/U6uXSAu9bM8GAW\n+dFNiweTAgMBAAECggEAMlzYAnloMDhh50POJAlH3Z77uHvxTg+vGiaE8xkcXzhB\nTxgLvC3V71wwvsQ7BR1oIFSSOcQf9bwpXiDRSIRersh7i3aiFSaS0nVUZh7Ci8hQ\no3kwJaQf2sRhjgcFe65un105EsJVsO6MOjqwryHNsUbBV0fob21fNwRAcYNJ1Q1m\nkyqE1HQYbrfpWGAY9TGcjd+yaml/sA1Z5kV+Jau+C9BZF2ebpyNjqLV5LHLi3syf\nbFh4WE9u8jVpJHMxuTVRt3cMw90uYQ7/SaKP/Hr3dBzu42YcQAzoqPc98lDQLbFH\nWa0q/ZXlJJVCXdJ1zaEsGHK7COUCKd+VVsVaWdMiVQKBgQDozX7W8lneZHm3ocQO\nlyXs+RnKvUgGB3iJzj3hw/NAa9dtK6NIBSPlYNKNIilPXc7n4laK1WxLM3L2AVqp\n58X/jxhaeRrT+I22r/9nnUyr/YLAEctIb+d8oi1yRxosIreo8hMBbEB3TfRmjc3u\n1fG4M4Bf3wl8Odp0DiDi+gYOnwKBgQDejYl043Bmp1OZhzpJfP3+6Q2frPuL+h6P\nujvw4Zbs18/H++uYDU9lcmGqLBDRd2x9kOeqU30qayyUYL385p9rRNUeHR+gupGR\nKmrJ6itvben97BGsBK0bA3Dg/koKnNNfZxy18zs2kPFDMev6jGdTWRJU/R4HXWWZ\nLa+fG1rGjQKBgHcA3M7J0hCx8dph0dPXheaOK5YMje2vEfn3uIBY51bOCbBftzbQ\nkdnmVZsZlF5iyKqWc8DCenoykZiZdpwVw4vwvPU6pPEoRGDXtMpliVT94UGHlw+v\nTHjUekDJgeJ/2Lx/CiIXERkrezyVTmjBaq/Le9sGK1YaSMY8lqkQP9pnAoGAf670\njftvIXYeoJbU+hScJQPQrSuxpj16Czvt5+WFkZy/uRzvrez1AF7/aYKeo47Az8mz\nICWGSi/zA639Unt+OyzimMRcwPpJSd/sJKwU/3kwJl6qRObp6fWvbWZ3VF9lZfbi\nogFKl6PQx5x8puKm5UrVGa2e7NrIz3lGqSIokoECgYEA50vDcRqSbEK+/k1LtLbh\n6dE0gEwX/IUFlBrVayfSQcZMzWVfRJbbk8ZNXobRUYBwtWViy4PUN1eFEmKxDTik\nx2ZbzROJk8BTYdxt7nqowGBFp2jUhcnaTYFi5R6LZ3TwFmZuUs1mu3IzPRSNFYAW\nVZ4OIGHw+S2MvTK407/I+ok=\n-----END PRIVATE KEY-----\n",
+  "client_email": "feriasagronomicasserviceaccoun@feriasagronomicas.iam.gserviceaccount.com",
+  "client_id": "100076073708872909362",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://accounts.google.com/o/oauth2/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/feriasagronomicasserviceaccoun%40feriasagronomicas.iam.gserviceaccount.com"
+}

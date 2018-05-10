@@ -1,0 +1,88 @@
+<!-- As a link -->
+<nav class="navbar navb">
+    <div class="container" style="display:inline-block; margin-left:0.5%;">
+        <a class="navbar-brand" href="#">
+                <img  class="icon"  src="../../../assets/Images/appIcon.jpg" alt=""> 
+
+              </a>
+        <a class="navbar-brand" href="#"><h3 style="color:white;">Ferias Agronómicas</h3></a>
+    </div>
+  </nav>
+
+
+<div class="container-fluid background"> 
+    <div class="container form">
+            <form style="border:4px;border-color:black;">
+                <br>
+                <h3> Registro de Productos </h3>
+                <br>
+                
+                <div class="form-group">
+                  <label for="nam">Nombre del producto:</label>
+                  <input required type="text" class="form-control" id="nam">
+                </div>
+
+                <div class="form-group">
+                    <label for="desc">Descripción del producto: </label>
+                    <input required type="text" class="form-control" id="desc">
+                  </div>
+
+                <div class="form-group">
+                  <label for="cod">Código del producto:</label>
+                  <input required type="text" class="form-control" id="cod">
+                </div>
+
+                <div class="form-group">
+                    <label for="type">Tipo del producto:</label>
+                    <select class="form-control" id="type" [(ngModel)]="selectedType" name="selectType">
+                        <option *ngFor="let type of productTypes" [ngValue]="type">
+                            {{type.o_producttypename}}
+                        </option>
+                    </select>
+                </div>
+
+                
+
+                <div class="form-group">
+                    <label for="pri">Precio del producto:</label>
+                    <input required type="number" class="form-control" id="pri" placeholder="Precio en colones">
+                  </div>
+
+                <div class="form-group">
+                  <label>Modalidad de venta para el producto </label>
+                  <br>
+                  <br>
+                  <div class="radio" style="display:inline-block;"  *ngFor="let item of saleModes">
+                    <label>
+                      <input type="radio" style="margin-left:12px;" name="item" [(ngModel)]="currentItem" [value]="item.symbol" [checked]="item===currentItem"> 
+                      {{ item.description}}
+                    </label>
+                  </div>
+                </div>
+  
+                  <div class="form-group">
+                    <label for="cant">Cantidad disponible:</label>
+                    <input required type="number" class="form-control" id="cant" placeholder="Cantidad de unidades que posee de este producto">
+                  </div>
+
+                <div class="form-group">
+                    <label for="imag">Imágen del producto: </label>
+                    <input required type="file" (change)="fileChangeEvent($event)"  id="img" name="image">
+                    
+                </div>
+  
+                <div class="form-group">
+                    <button class="btn btn-primary" (click)="registerProduct()"> Registrar producto </button>                  
+                </div>
+
+                
+
+                <br>
+                <br>
+              </form>
+  
+    </div>
+    
+  
+  
+  </div>

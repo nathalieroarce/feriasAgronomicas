@@ -1,0 +1,105 @@
+<!-- As a link -->
+<nav class="navbar navb">
+    <div class="container" style="display:inline-block; margin-left:0.5%;">
+        <a class="navbar-brand" href="#">
+                <img  class="icon"  src="../../../assets/Images/appIcon.jpg" alt=""> 
+
+              </a>
+        <a class="navbar-brand" href="#"><h3 style="color:white;">Ferias Agronómicas</h3></a>
+    </div>
+  </nav>
+
+<div class="container-fluid background"> 
+    <div class="container form">
+            <form style="border:4px;border-color:black;">
+                <br>
+                <h3> Registro de Empresa </h3>
+                <br>
+                
+                <div class="form-group">
+                  <label for="usr">Nombre de la entidad:</label>
+                  <input type="text" class="form-control" id="usr" placeholder="Nombre de tu empresa">
+                </div>
+                <div class="form-group">
+                  <label for="des">Descripción:</label>
+                  <input type="text" class="form-control" id="des">
+                </div>
+                <div class="form-group">
+                    <label for="res">Nombre del responsable de la empresa:</label>
+                    <input type="text" class="form-control" id="res">
+                  </div>
+  
+                <div class="form-group">
+                      <label for="ced">Cédula:</label>
+                      <input type="text" class="form-control" id="ced">
+                </div>
+  
+                <div class="form-group">
+                    <label for="email">Correo de la empresa o del responsable:</label>
+                    <input type="email" class="form-control" id="email">
+                  </div>
+  
+                  <div class="form-group">
+                      <label for="cel">Número de teléfono de la empresa o del responsable:</label>
+                      <input type="text" class="form-control" id="cel">
+                    </div>
+  
+                  <div class="form-group">
+                        <label for="pas">Contraseña:</label>
+                        <input type="password" class="form-control" id="pas">
+                  </div>
+  
+                  <div class="form-group">
+                      <label for="pass">Confirmar contraseña :</label>
+                      <input type="password" class="form-control" id="pass">
+                  </div>
+
+                <div class="form-group">
+                    <label for="loc">Ubicación de la empresa:</label>
+                    <agm-map class="map"  [latitude]="lat" id="loc" [longitude]="lng" (mapClick)="changeLocation($event)">
+                        <agm-marker [latitude]="lat" [longitude]="lng">
+                        </agm-marker>
+                      </agm-map>
+                </div>
+  
+                <div class="form-group">
+                    <label for="delP">Punto de entrega de productos:</label>
+                    <agm-map class="map"  [latitude]="lat" id="delP" [longitude]="lng" (mapClick)="changeLocation($event)">
+                        <agm-marker [latitude]="lat" [longitude]="lng">
+                        </agm-marker>
+                      </agm-map>
+                </div>
+                <br>
+                <div class="form-group">
+                    <label for="imag">Imágen o ícono de la empresa: </label>
+                    <input type="file" name="image">
+                    
+                </div>
+  
+                <div class="form-group">
+                    <label><input type="checkbox" class="fomr-control" [(ngModel)]="provideExpress" name="express">
+                      Ofrece servicio express </label>
+                    
+                </div>
+
+                   <!-- ng*If , only display if the enterprise offers express service  -->
+  
+                <div *ngIf="provideExpress === true" class="form-group">
+                    <label for="price">Cobro por kilómetro: </label>
+                    <input type="number" class="form-control" id="price" placeholder="Precio en colones">
+                    
+                </div>
+  
+                <div class="form-group">
+                    <button class="btn btn-primary"> Registrar </button>                  
+                </div>
+  
+             
+  
+              </form>
+  
+    </div>
+  
+  
+  </div>
+  

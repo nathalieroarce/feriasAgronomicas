@@ -1,0 +1,99 @@
+import { Component, OnInit } from '@angular/core';
+import { ProductsManagementService } from '../../services/administrador-view/products-management.service';
+import { generalChecker } from '../../models/generalChecker';
+import { userNotifications } from '../../models/userNotifications';
+
+//import globals vars
+import * as globalsVars from '../../../../globals';
+
+declare var swal:any;
+
+@Component({
+  selector: 'app-products-registration',
+  templateUrl: './products-registration.component.html',
+  styleUrls: ['./products-registration.component.css']
+})
+export class ProductsRegistrationComponent implements OnInit {
+
+
+  private saleModes:any;
+  private currentItem:String;
+  private selectedType: any;
+  private productTypes:any;
+  private productImage: File;
+  private checker: generalChecker;
+  private userNotify: userNotifications;
+
+  constructor(private productsService:ProductsManagementService) {
+    this.userNotify= new userNotifications(); 
+    this.checker= new generalChecker();
+    this.saleModes=globalsVars.saleModes;
+    this.currentItem=this.saleModes[0].symbol;
+    this.getProductTypes();
+  }
+
+
+  public restarValues(){
+
+  }
+
+  public fileChangeEvent(event){
+    let fileList: FileList = event.target.files;
+    if(fileList.length > 0) {
+      this.productImage = fileList[0];
+    }
+
+  }
+
+
+  public registerProduct(){
+   
+    let array: Array<any>=[
+      (document.getElementById("nam") as HTMLInputElement).value,
+      (document.getElementById("desc") as HTMLInputElement).value,
+      (document.getElementById("cod") as HTMLInputElement).value,
+      this.selectedType.o_producttypeid,
+      (document.getElementById("pri") as HTMLInputElement).value,
+      this.currentItem,   
+      (document.getElementById("cant") as HTMLInputElement).value,
+
+      ]
+    if (this.checker.notNullValues(array)  == true && this.productImage!= undefined)  {
+        
+        this.productsService.registerProduct(this.productImage,array).subscribe(
+          (res) =>{
+            console.log("¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨***********+");
+            console.log("res");
+            console.log(res);
+            console.log("¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨***********+");
+            if (res.response === true){
+              this.userNotify.notify(3,"El producto ha sido registrado", "Notificación del sistema");
+            }
+            else{
+              this.userNotify.notify(1,res.message, "Notificación del sistema");
+            }
+          },
+          (err) => {
+            console.log(err.json());   
+          });
+    }
+  }
+
+  public getProductTypes(){
+      this.productsService.getProductTypes().subscribe(
+        (res) =>{
+    
+          if (res.response === true){
+            this.productTypes=res.data;
+            this.selectedType=this.productTypes[0];
+          }
+        },
+        (err) => {
+          console.log(err.json());   
+        });
+  }
+
+  ngOnInit() {
+  }
+
+}
