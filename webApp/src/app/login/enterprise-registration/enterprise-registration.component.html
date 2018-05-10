@@ -89,12 +89,13 @@
   
                 <div *ngIf="provideExpress === true" class="form-group">
                     <label for="price">Cobro por kilómetro: </label>
-                    <input type="number" class="form-control" id="price" placeholder="Precio en colones">
+                    <input type="number" class="form-control" id="price" [(ngModel)]="pricePerKM" 
+                    [ngModelOptions]="{standalone: true}" placeholder="Precio en colones">
                     
                 </div>
   
                 <div class="form-group">
-                    <button class="btn btn-primary"  (click)="registerCompany()"> Registrar </button>                  
+                    <button class="btn btn-primary"  (click)="initRegistration()"> Registrar </button>                  
                 </div>
 
                 <div *ngIf="registeringEnterprise" class="form-group">

@@ -35,13 +35,6 @@ export class ProductsRegistrationComponent implements OnInit {
     this.getProductTypes();
   }
 
-
-  public restarValues(){
-
-  }
-
-
-
   /**
    * 
   * @param event contains files that are selected

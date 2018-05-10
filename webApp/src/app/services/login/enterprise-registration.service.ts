@@ -28,6 +28,8 @@ export class EnterpriseRegistrationService {
     formData.append('enterpriseLocation', data[8]);
     formData.append('enterpriseDeliveryPointLocation', data[9]);
     formData.append('expressService', data[10]);
+    formData.append('locationName', data[11]);
+
 
     //add the other data
 

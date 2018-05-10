@@ -31,9 +31,11 @@ export class EnterpriseRegistrationComponent implements OnInit {
   private enterpriseLocationName:String;
   private registeringEnterprise: Boolean;
   private enterpriseImage: File;
+  private pricePerKM:Number;
 
   constructor(private enterpriseRegistrationService: EnterpriseRegistrationService) { 
     this.checker= new generalChecker();
+    this.pricePerKM=0;
     this.registeringEnterprise=false;
     this.userNotify= new userNotifications(); 
     this.provideExpress=false;
@@ -42,7 +44,6 @@ export class EnterpriseRegistrationComponent implements OnInit {
     this.enterpriseLocationName= "Desconocida" ;
 
     //set price for express service by default
-    (document.getElementById("price") as HTMLInputElement).value="0";
     this.setCurrentPosition();
   }
 
@@ -58,6 +59,64 @@ export class EnterpriseRegistrationComponent implements OnInit {
       this.enterpriseDeliveryPointLocation.push(position.coords.longitude);
     });
 
+  }
+
+
+
+  /**
+   * Go to register the company,
+   * 
+   */
+  public registerCompany(){
+
+    //check if passwords are not equals
+    if ((document.getElementById("passw") as HTMLInputElement).value !=
+        (document.getElementById("pass") as HTMLInputElement).value){
+          this.userNotify.notify(1,"Las contraseñas no coinciden","Notificación del sistema");
+          return;
+    }
+
+    let array: Array<any>=[
+      (document.getElementById("name") as HTMLInputElement).value,
+      (document.getElementById("des") as HTMLInputElement).value,
+      (document.getElementById("res") as HTMLInputElement).value,
+      (document.getElementById("ced") as HTMLInputElement).value,
+      (document.getElementById("email") as HTMLInputElement).value,
+      (document.getElementById("cel") as HTMLInputElement).value,
+      (document.getElementById("passw") as HTMLInputElement).value,
+      this.pricePerKM
+      ]
+
+      if (this.checker.notNullValues(array)  == true && this.enterpriseImage!=undefined )  {
+        this.registeringEnterprise=true;
+        array.push(this.enterpriseLocation);
+        array.push(this.enterpriseDeliveryPointLocation);
+        array.push(this.provideExpress);
+        array.push(this.enterpriseLocationName);
+       
+        this.enterpriseRegistrationService.registerEnterprise(this.enterpriseImage,array).subscribe(
+          (res) =>{
+            console.log("¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨***********+");
+            console.log("res");
+            console.log(res);
+            console.log("¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨***********+");
+            if (res.response === true){
+              this.userNotify.notify(3,"La emrpesa ha sido registrada", "Notificación del sistema");
+              this.resetForm();
+            }
+            else{
+              this.userNotify.notify(1,res.message, "Notificación del sistema");
+            }
+            this.registeringEnterprise=false;
+          },
+          (err) => {
+            console.log(err.json());   
+            this.registeringEnterprise=false;
+          });
+    }
+    else{
+      this.userNotify.notify(1,"Algún campo del formulario se encuentra vacío","Notificación del sistema");
+    }
   }
 
 
@@ -103,7 +162,7 @@ export class EnterpriseRegistrationComponent implements OnInit {
     (document.getElementById("cel") as HTMLInputElement).value="",
     (document.getElementById("passw") as HTMLInputElement).value="",
     (document.getElementById("pass") as HTMLInputElement).value="",
-    (document.getElementById("price") as HTMLInputElement).value="",
+    this.pricePerKM=0,
     this.provideExpress=false;
     this.setCurrentPosition();
 
@@ -124,60 +183,6 @@ export class EnterpriseRegistrationComponent implements OnInit {
   }
 
 
-  /**
-   * Go to register the company,
-   * 
-   */
-  public registerCompany(){
-
-    //check if passwords are not equals
-    if ((document.getElementById("passw") as HTMLInputElement).value !=
-        (document.getElementById("pass") as HTMLInputElement).value){
-          this.userNotify.notify(1,"Las contraseñas no coinciden","Notificación del sistema");
-          return;
-    }
-
-    let array: Array<any>=[
-      (document.getElementById("name") as HTMLInputElement).value,
-      (document.getElementById("des") as HTMLInputElement).value,
-      (document.getElementById("res") as HTMLInputElement).value,
-      (document.getElementById("ced") as HTMLInputElement).value,
-      (document.getElementById("email") as HTMLInputElement).value,
-      (document.getElementById("cel") as HTMLInputElement).value,
-      (document.getElementById("passw") as HTMLInputElement).value,
-      (document.getElementById("price") as HTMLInputElement).value
-      ]
-
-      if (this.checker.notNullValues(array)  == true && this.enterpriseImage!=undefined )  {
-        this.registeringEnterprise=true;
-        array.push(this.enterpriseLocation);
-        array.push(this.enterpriseDeliveryPointLocation);
-        array.push(this.provideExpress);
-       
-        this.enterpriseRegistrationService.registerEnterprise(this.enterpriseImage,array).subscribe(
-          (res) =>{
-            console.log("¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨***********+");
-            console.log("res");
-            console.log(res);
-            console.log("¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨***********+");
-            if (res.response === true){
-              this.userNotify.notify(3,"La emrpesa ha sido registrada", "Notificación del sistema");
-              this.resetForm();
-            }
-            else{
-              this.userNotify.notify(1,res.message, "Notificación del sistema");
-            }
-            this.registeringEnterprise=false;
-          },
-          (err) => {
-            console.log(err.json());   
-            this.registeringEnterprise=false;
-          });
-    }
-    else{
-      this.userNotify.notify(1,"Algún campo del formulario se encuentra vacío","Notificación del sistema");
-    }
-  }
 
   /**
    * 

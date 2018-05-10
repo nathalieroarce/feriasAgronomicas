@@ -177,7 +177,7 @@ app.post('/registerProduct',function(req,res)
 									})
 		    						.catch(error=> {
 		            					console.log("ERROR: ",error);
-		        						res.end(JSON.stringify({ response:false,"data":[]}));
+		        						res.end(JSON.stringify({ response:false}));
     										})
 
         				}
@@ -202,9 +202,58 @@ app.post('/registerProduct',function(req,res)
 
     });
 
+app.post('/registerEnterprise',function(req,res)
+{
+	console.log("registrar empresa");
+	upload(req,res, function (err) {
+        if (err) {
+            res.end(JSON.stringify({response:false,message: "El proceso de cargo de la imagen no fue exitoso"}));
+        }
+        else{
+
+        	if (req.file) {
+        		//upload image to service
+        		uploadToService(req.file,enterpriseBucketName,function(response){
+        				if (response.response===true){
+        					//execute the store procedure
+
+        					//1 is an enterprise
+        					db.func('sp_insertEnterprise',[req.body.name,response.imageUrl,req.body.description,req.body.responsableName,
+        							req.body.responsableIDCardNumber,req.body.email,req.body.password,req.body.telephoneNumber,req.body.expressService,
+        							req.body.price,req.body.locationName,"POINT("+ req.body.enterpriseLocation[0]+" "+req.body.enterpriseLocation[1]+")",
+        							"POINT("+ req.body.enterpriseDeliveryPointLocation[0]+" "+req.body.enterpriseDeliveryPointLocation[1]+")"
+        							])
+									.then(data => {
+										console.log(data);
+										res.end(JSON.stringify({"response" :data[0].sp_insertEnterprise}));
+									})
+		    						.catch(error=> {
+		            					console.log("ERROR: ",error);
+		        						res.end(JSON.stringify({ response:false}));
+    										})
+
+        				}
 
 
+        				else{
+        					res.end(JSON.stringify({response:false,message: "El proceso de carga de la imagen no fue existoso"}));
+        				}
 
+        				deleteImageFromLocal(folderDirection+"/"+ req.file.filename);
+
+        		})
+
+        	  }
+
+			else{
+				res.end(JSON.stringify({response:false,message: "El proceso de carga de la imagen no fue existoso"}));
+
+			}
+		}
+
+    });
+
+    });
 
 
 app.get('/getProductTypes',function(req,res)
@@ -220,6 +269,48 @@ app.get('/getProductTypes',function(req,res)
 
 });
 
+
+app.get('/getEnterpriseProducts',function(req,res)
+{
+	db.func('sp_getProductsByEnterpriseID',[req.query.enterpriseID])
+		.then(data => {
+			console.log(data);
+			res.end(JSON.stringify({response:true, "data": data } ) );
+			})
+		  .catch(error=> {
+		    console.log("ERROR: ",error);
+		    res.end(JSON.stringify({ response:false,"data":[]}));})
+
+});
+
+app.get('/getEnterprises',function(req,res)
+{
+	db.func('sp_getEnterprises')
+		.then(data => {
+			console.log(data);
+			res.end(JSON.stringify({response:true, "data": data } ) );
+			})
+		  .catch(error=> {
+		    console.log("ERROR: ",error);
+		    res.end(JSON.stringify({ response:false,"data":[]}));})
+
+});
+
+
+
+
+app.get('/getProductsByKey',function(req,res)
+{
+	db.func('sp_getProductsByKey')
+		.then(data => {
+			console.log(data);
+			res.end(JSON.stringify({response:true, "data": data } ) );
+			})
+		  .catch(error=> {
+		    console.log("ERROR: ",error);
+		    res.end(JSON.stringify({ response:false,"data":[]}));})
+
+});
 
 
 var server = app.listen(8081, function ()
