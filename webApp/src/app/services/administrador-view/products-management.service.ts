@@ -23,15 +23,15 @@ export class ProductsManagementService {
     
     const formData: FormData = new FormData();
     formData.append('image', image, image.name);
-    formData.append('name', data[0]);
-    formData.append('description', data[1]);
-    formData.append('code', data[2]);
-    formData.append('productType', data[3]);
-    formData.append('price', data[4]);
-    formData.append('unit', data[5]);
-    formData.append('stock', data[6]);
+    formData.append('enterpriseID', data[0]);
+    formData.append('name', data[1]);
+    formData.append('description', data[2]);
+    formData.append('code', data[3]);
+    formData.append('productType', data[4]);
+    formData.append('price', data[5]);
+    formData.append('unit', data[6]);
+    formData.append('stock', data[7]);
 
-    //add the other data
 
     const headers = new Headers();
     headers.append('Content-Type', 'multipart/form-data');

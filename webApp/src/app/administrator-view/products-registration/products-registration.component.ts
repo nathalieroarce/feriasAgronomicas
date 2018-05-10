@@ -5,6 +5,7 @@ import { userNotifications } from '../../models/userNotifications';
 
 //import globals vars
 import * as globalsVars from '../../../../globals';
+import { FormGroup } from '@angular/forms';
 
 declare var swal:any;
 
@@ -16,6 +17,7 @@ declare var swal:any;
 export class ProductsRegistrationComponent implements OnInit {
 
 
+  private registeringProduct:Boolean;
   private saleModes:any;
   private currentItem:String;
   private selectedType: any;
@@ -26,6 +28,7 @@ export class ProductsRegistrationComponent implements OnInit {
 
   constructor(private productsService:ProductsManagementService) {
     this.userNotify= new userNotifications(); 
+    this.registeringProduct=false;
     this.checker= new generalChecker();
     this.saleModes=globalsVars.saleModes;
     this.currentItem=this.saleModes[0].symbol;
@@ -37,6 +40,12 @@ export class ProductsRegistrationComponent implements OnInit {
 
   }
 
+
+
+  /**
+   * 
+  * @param event contains files that are selected
+   */
   public fileChangeEvent(event){
     let fileList: FileList = event.target.files;
     if(fileList.length > 0) {
@@ -46,20 +55,33 @@ export class ProductsRegistrationComponent implements OnInit {
   }
 
 
+  public resetForm(){
+    (document.getElementById("nam") as HTMLInputElement).value="";
+    (document.getElementById("desc") as HTMLInputElement).value="";
+    (document.getElementById("cod") as HTMLInputElement).value="";
+    (document.getElementById("pri") as HTMLInputElement).value="";   
+    (document.getElementById("cant") as HTMLInputElement).value="";
+  }
+
+
   public registerProduct(){
-   
+    /*remember to add enterpriseID then when the system have all products component
+          maybe you can get it through local storage
+        */
     let array: Array<any>=[
+      1,
       (document.getElementById("nam") as HTMLInputElement).value,
       (document.getElementById("desc") as HTMLInputElement).value,
       (document.getElementById("cod") as HTMLInputElement).value,
       this.selectedType.o_producttypeid,
       (document.getElementById("pri") as HTMLInputElement).value,
       this.currentItem,   
-      (document.getElementById("cant") as HTMLInputElement).value,
-
+      (document.getElementById("cant") as HTMLInputElement).value
       ]
     if (this.checker.notNullValues(array)  == true && this.productImage!= undefined)  {
-        
+        this.registeringProduct=true;
+
+       
         this.productsService.registerProduct(this.productImage,array).subscribe(
           (res) =>{
             console.log("¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨***********+");
@@ -68,14 +90,20 @@ export class ProductsRegistrationComponent implements OnInit {
             console.log("¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨***********+");
             if (res.response === true){
               this.userNotify.notify(3,"El producto ha sido registrado", "Notificación del sistema");
+              this.resetForm();
             }
             else{
               this.userNotify.notify(1,res.message, "Notificación del sistema");
             }
+            this.registeringProduct=false;
           },
           (err) => {
             console.log(err.json());   
+            this.registeringProduct=false;
           });
+    }
+    else{
+      this.userNotify.notify(1,"Algún campo del formulario se encuentra vacío","Notificación del sistema");
     }
   }
 

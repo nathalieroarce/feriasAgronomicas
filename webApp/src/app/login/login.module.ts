@@ -7,6 +7,7 @@ import { AgmCoreModule } from '@agm/core';
 //import globals vars
 import * as globalsVars from '../../../globals';
 import { FormsModule } from '@angular/forms';
+import { EnterpriseRegistrationService } from '../services/login/enterprise-registration.service';
 
 
 const routes: Routes = [
@@ -23,6 +24,7 @@ const routes: Routes = [
       apiKey:  globalsVars.api_key
     })
   ],
-  declarations: [LoginViewComponent, EnterpriseRegistrationComponent]
+  declarations: [LoginViewComponent, EnterpriseRegistrationComponent],
+  providers: [EnterpriseRegistrationService]
 })
 export class LoginModule { }

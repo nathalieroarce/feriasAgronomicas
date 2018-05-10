@@ -39,6 +39,8 @@ var pgp = require('pg-promise')();
 var cn = {host: 'localhost', port: 5432, database: 'agriculturalfairs', user: 'postgres', password: '12345'};
 var db = pgp(cn);
 
+
+
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -154,17 +156,10 @@ app.post('/registerProduct',function(req,res)
 	console.log("registrar Producto");	
 	upload(req,res, function (err) {
         if (err) {
-        	console.log(err);
             res.end(JSON.stringify({response:false,message: "El proceso de cargo de la imagen no fue exitoso"}));
         }
         else{
-        	console.log(req.body.name);
-        	console.log(req.body);
-        	console.log("¡¡¡¡¡ Nombre del archivo imagen !!!!!!!!!!!!!!!");
-        	console.log(req.file.filename);
-        	console.log("nombre de usuario especificado");
-        	console.log(req.body.name);
-        	console.log(req.body.price);
+
         	if (req.file) {
         		//upload image to service
         		uploadToService(req.file,productsBucketName,function(response){
@@ -172,11 +167,11 @@ app.post('/registerProduct',function(req,res)
         					//execute the store procedure
         					
         					//1 is an enterprise
-        					db.func('sp_insertProduct',[1,req.body.name,req.body.code,req.body.price,req.body.unit,response.imageUrl,
+        					db.func('sp_insertProduct',[req.body.enterpriseID,req.body.name,req.body.code,req.body.price,req.body.unit,response.imageUrl,
         										req.body.productType, req.body.description, req.body.stock])
 									.then(data => {
 										console.log(data);
-										res.end(JSON.stringify({"response" :data.sp_insertproduct}));
+										res.end(JSON.stringify({"response" :data[0].sp_insertproduct}));
 									})
 		    						.catch(error=> {
 		            					console.log("ERROR: ",error);
@@ -204,6 +199,11 @@ app.post('/registerProduct',function(req,res)
     });
 
     });
+
+
+
+
+
 
 app.get('/getProductTypes',function(req,res)
 {

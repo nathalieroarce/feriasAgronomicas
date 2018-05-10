@@ -17,8 +17,8 @@
                 <br>
                 
                 <div class="form-group">
-                  <label for="usr">Nombre de la entidad:</label>
-                  <input type="text" class="form-control" id="usr" placeholder="Nombre de tu empresa">
+                  <label for="name">Nombre de la entidad:</label>
+                  <input type="text" class="form-control" id="name" placeholder="Nombre de tu empresa">
                 </div>
                 <div class="form-group">
                   <label for="des">Descripción:</label>
@@ -30,8 +30,8 @@
                   </div>
   
                 <div class="form-group">
-                      <label for="ced">Cédula:</label>
-                      <input type="text" class="form-control" id="ced">
+                      <label for="ced">Cédula del responsable:</label>
+                      <input placeholder="Ejemplo: 2-4500-0089" type="text" class="form-control" id="ced">
                 </div>
   
                 <div class="form-group">
@@ -41,12 +41,12 @@
   
                   <div class="form-group">
                       <label for="cel">Número de teléfono de la empresa o del responsable:</label>
-                      <input type="text" class="form-control" id="cel">
+                      <input placeholder="Ejemplo: 2444-5655" type="text" class="form-control" id="cel">
                     </div>
   
                   <div class="form-group">
-                        <label for="pas">Contraseña:</label>
-                        <input type="password" class="form-control" id="pas">
+                        <label for="passw">Contraseña:</label>
+                        <input type="password" class="form-control" id="passw">
                   </div>
   
                   <div class="form-group">
@@ -56,23 +56,26 @@
 
                 <div class="form-group">
                     <label for="loc">Ubicación de la empresa:</label>
-                    <agm-map class="map"  [latitude]="lat" id="loc" [longitude]="lng" (mapClick)="changeLocation($event)">
-                        <agm-marker [latitude]="lat" [longitude]="lng">
+                    <agm-map class="map"  [latitude]="enterpriseLocation[0]" id="loc" 
+                        [longitude]="enterpriseLocation[1]" (mapClick)="changeLocation($event,true)">
+                        <agm-marker [latitude]="enterpriseLocation[0]"
+                         [longitude]="enterpriseLocation[1]">
                         </agm-marker>
                       </agm-map>
                 </div>
   
                 <div class="form-group">
                     <label for="delP">Punto de entrega de productos:</label>
-                    <agm-map class="map"  [latitude]="lat" id="delP" [longitude]="lng" (mapClick)="changeLocation($event)">
-                        <agm-marker [latitude]="lat" [longitude]="lng">
+                    <agm-map class="map"  [latitude]="enterpriseDeliveryPointLocation[0]" id="delP" 
+                    [longitude]="enterpriseDeliveryPointLocation[1]" (mapClick)="changeLocation($event,false)">
+                        <agm-marker [latitude]="enterpriseDeliveryPointLocation[0]" [longitude]="enterpriseDeliveryPointLocation[1]">
                         </agm-marker>
                       </agm-map>
                 </div>
                 <br>
                 <div class="form-group">
                     <label for="imag">Imágen o ícono de la empresa: </label>
-                    <input type="file" name="image">
+                    <input type="file" (change)="fileChangeEvent($event)" name="image">
                     
                 </div>
   
@@ -91,7 +94,11 @@
                 </div>
   
                 <div class="form-group">
-                    <button class="btn btn-primary"> Registrar </button>                  
+                    <button class="btn btn-primary"  (click)="registerCompany()"> Registrar </button>                  
+                </div>
+
+                <div *ngIf="registeringEnterprise" class="form-group">
+                    <span> Registrando la empresa ... </span>               
                 </div>
   
              

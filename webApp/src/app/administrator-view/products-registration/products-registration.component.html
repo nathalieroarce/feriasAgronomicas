@@ -75,7 +75,9 @@
                     <button class="btn btn-primary" (click)="registerProduct()"> Registrar producto </button>                  
                 </div>
 
-                
+                <div *ngIf="registeringProduct" class="form-group">
+                  <span> Registrando el producto ... </span>               
+              </div>
 
                 <br>
                 <br>
