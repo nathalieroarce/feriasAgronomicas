@@ -143,7 +143,7 @@ export class EnterpriseRegistrationComponent implements OnInit {
       if (status === google.maps.GeocoderStatus.OK) {
         // si encontró algún resultado.
         if (results[1]) {
-          this.enterpriseLocationName= results[1].formatted_address;
+          that.enterpriseLocationName= results[1].formatted_address;
           that.registerEnterprise();
         }
         else{

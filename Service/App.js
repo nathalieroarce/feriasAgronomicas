@@ -301,7 +301,7 @@ app.get('/getEnterprises',function(req,res)
 
 app.get('/getProductsByKey',function(req,res)
 {
-	db.func('sp_getProductsByKey')
+	db.func('sp_getProductsByKey',[req.query.key,req.query.enterpriseID])
 		.then(data => {
 			console.log(data);
 			res.end(JSON.stringify({response:true, "data": data } ) );
