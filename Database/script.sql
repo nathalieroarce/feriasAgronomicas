@@ -1,4 +1,4 @@
-/***********************************************************
+﻿/***********************************************************
 DOMAINS
 ************************************************************/
 CREATE DOMAIN t_unit CHAR(1) NOT NULL CONSTRAINT
@@ -184,6 +184,11 @@ BEGIN
 END;
 $body$
 LANGUAGE plpgsql;
+
+
+insert into productTypes(typeName) values ('Frutas'),('Legumbres'),('Vegetales');
+
+
 
 /*Prueba:
 

@@ -67,7 +67,7 @@ export class EnterpriseRegistrationComponent implements OnInit {
    * Go to register the company,
    * 
    */
-  public registerCompany(){
+  public registerEnterprise(){
 
     //check if passwords are not equals
     if ((document.getElementById("passw") as HTMLInputElement).value !=
@@ -118,8 +118,7 @@ export class EnterpriseRegistrationComponent implements OnInit {
       this.userNotify.notify(1,"Algún campo del formulario se encuentra vacío","Notificación del sistema");
     }
   }
-
-
+  
   public initRegistration(){
     this.getNameOfPosition(this.enterpriseLocation);
   }
@@ -134,6 +133,7 @@ export class EnterpriseRegistrationComponent implements OnInit {
       lat: position[0],
       lng: position[1]
     };
+    let that=this;
     var geocoder = new google.maps.Geocoder;
      geocoder.geocode({
     'location': latlng
@@ -144,7 +144,7 @@ export class EnterpriseRegistrationComponent implements OnInit {
         // si encontró algún resultado.
         if (results[1]) {
           this.enterpriseLocationName= results[1].formatted_address;
-          this.registerCompany();
+          that.registerEnterprise();
         }
         else{
           this.userNotify.notify(1,"El registro no puede realizarse debido"+

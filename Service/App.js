@@ -225,7 +225,7 @@ app.post('/registerEnterprise',function(req,res)
         							])
 									.then(data => {
 										console.log(data);
-										res.end(JSON.stringify({"response" :data[0].sp_insertEnterprise}));
+										res.end(JSON.stringify({"response" :data[0].sp_insertenterprise}));
 									})
 		    						.catch(error=> {
 		            					console.log("ERROR: ",error);
