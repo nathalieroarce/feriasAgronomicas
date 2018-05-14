@@ -7,9 +7,6 @@ export default class  Login {
   {
     return (<View>
 
-      <TextInput/>
-      <TextInput/>
-      <Button/>                  
       </View>)
   }
 }

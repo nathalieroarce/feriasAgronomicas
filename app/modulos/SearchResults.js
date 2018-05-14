@@ -1,21 +1,10 @@
 import React, { Component } from 'react';
 import { ListView, View, Image, Text, StyleSheet } from 'react-native';
-
-
-const data = [
-  {
-    o_image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQgczAlJbEstRsc8i1avw9AbHP9CNJanGCSK1k5Vs8nZ-sjWJyY3g',
-    o_enterprisename: 'El norte S.A.',
-    o_productname: 'Papas',
-    id: 0,
-    o_locationname : 'Santa clara, San Carlos, Alajuela, Costa Rica',
-    o_price: 100,
-    o_unit: 'Kgg',
-  }
-];
+import {MaterialIcons} from 'react-native-vector-icons';
 
 const rowHasChanged = (r1, r2) => r1.id !== r2.id;
 const ds = new ListView.DataSource({ rowHasChanged });
+
 const styles = StyleSheet.create({
   appContainer: {
     flex: 1,
@@ -51,7 +40,7 @@ class SearchResults extends Component {
   };
 
   state = {
-    dataSource: ds.cloneWithRows(data),
+    dataSource: ds.cloneWithRows(this.props.data),
   };
 
   renderRow = rowData => {
