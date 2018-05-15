@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { ListView, View, Image, Text, StyleSheet } from 'react-native';
 import { createStackNavigator } from 'react-navigation';
+var styles = require('./styles');
 
 const data = [
   {
@@ -16,34 +17,6 @@ const data = [
 
 const rowHasChanged = (r1, r2) => r1.id !== r2.id;
 const ds = new ListView.DataSource({ rowHasChanged });
-const styles = StyleSheet.create({
-  appContainer: {
-    flex: 1,
-    backgroundColor:'white',
-  },
-  image: {
-    width: 70,
-    height: 70,
-  },
-  row: {
-    flexDirection: 'row',
-    padding: 15,
-    marginBottom: 5,
-    backgroundColor: '#E6E6E6',
-  },
-  rowContent: {
-    paddingLeft: 40,
-    flexDirection: 'column',
-    flex: 1,
-    justifyContent: 'center',
-    alignContent: 'center',
-  },
-  rowTitle: {
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-});
-
 
 class SearchResults extends Component {
   print = () => {
@@ -51,7 +24,7 @@ class SearchResults extends Component {
   };
 
   state = {
-    dataSource: ds.cloneWithRows(data),
+    dataSource: ds.cloneWithRows(this.props.navigation.state.params.type),
   };
 
   renderRow = rowData => {

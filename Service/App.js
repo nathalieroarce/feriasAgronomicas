@@ -1,6 +1,6 @@
 
 var pg = require('pg');
-var conString = "postgres://postgres:12345@localhost:5432/agriculturalfairs";
+var conString = "postgres://postgres:postgresql2017@localhost:5432/agriculturalfairs";
 var client;
 var fs = require('fs');
 var express = require('express');
@@ -36,7 +36,7 @@ const storageMulter = multer.diskStorage({
 const upload = multer({ storage: storageMulter }).single('image');
 
 var pgp = require('pg-promise')();
-var cn = {host: 'localhost', port: 5432, database: 'agriculturalfairs', user: 'postgres', password: '12345'};
+var cn = {host: 'localhost', port: 5432, database: 'agriculturalfairs', user: 'postgres', password: 'postgresql2017'};
 var db = pgp(cn);
 
 

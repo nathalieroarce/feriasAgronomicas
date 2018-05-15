@@ -1,12 +1,13 @@
 import React, {Component} from 'react';
 import {View, Text,StyleSheet, Button} from 'react-native';
 import { createStackNavigator } from 'react-navigation';
+var styles = require('./styles');
 
-export class Settings extends Component {
+export class ShoppingCart extends Component {
   render()
   {
     return (
-      <View style = {styles.container}>      
+      <View style = {styles.container}>
         <Text> This is the Settings screen </Text>
         <Button onPress = {()=> this.props.navigation.navigate('HomeScreen')} title='Home' />
       </View>
@@ -14,14 +15,6 @@ export class Settings extends Component {
   }
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#0B4C5F',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
 export default createStackNavigator(
   {
     screen: Settings

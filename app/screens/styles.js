@@ -38,7 +38,31 @@ module.exports = StyleSheet.create({
   },
   text:
   {
-      fontSize: 16,      
-  }
-
+      fontSize: 16,
+  },
+  appContainer: {
+    flex: 1,
+    backgroundColor:'white',
+  },
+  image: {
+    width: 70,
+    height: 70,
+  },
+  row: {
+    flexDirection: 'row',
+    padding: 15,
+    marginBottom: 5,
+    backgroundColor: '#E6E6E6',
+  },
+  rowContent: {
+    paddingLeft: 40,
+    flexDirection: 'column',
+    flex: 1,
+    justifyContent: 'center',
+    alignContent: 'center',
+  },
+  rowTitle: {
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
 });

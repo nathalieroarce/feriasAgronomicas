@@ -1,12 +1,10 @@
 import React, { Component } from 'react';
-import SearchResults from './modulos/SearchResults';
 import {View ,StyleSheet } from 'react-native';
 import { SearchBar, Header, Icon } from 'react-native-elements';
 import {MaterialIcons} from 'react-native-vector-icons';
-
 var styles = require('./styles');
 
-export class Home  extends Component
+export class Home extends Component
 {
   state = {
       requestType : 'enterprises',
@@ -55,9 +53,9 @@ export class Home  extends Component
       }
   };
 
-  setInterval(() => {
+  /*setInterval(() => {
   this.handleSearch();
-  }, 5000);
+}, 5000);*/
 
   render()
     {

@@ -1,19 +1,18 @@
 import React, {Component} from 'react';
 import { Platform, StyleSheet, Text, View } from 'react-native';
 import {StackNavigator, DrawerNavigator} from 'react-navigation';
-import Settings from './screens/Settings';
+import { createStackNavigator } from 'react-navigation';
+
+import Settings from './screens/ShoppingCart';
 import Home from './screens/Home';
 import Login from './screens/Login';
 import SearchResults from './screens/SearchResults';
 
 
-import { createStackNavigator } from 'react-navigation';
-
-
 const RootStack = createStackNavigator(
   {
     HomeScreen: Home,
-    SettingsScreen: Settings,
+    ShoppingCartScreen: ShoppingCart ,
     LoginScreen : Login,
     SearchResultsScreen : SearchResults
   },
@@ -23,18 +22,10 @@ const RootStack = createStackNavigator(
   },
 );
 
-
 export default class App extends Component {
   render() {
     return (
-        <RootStack style ={styles.container}/>
+        <RootStack style = {{flex: 1,backgroundColor: '#000'}}/>
     );
-  }
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#000'
-  },
-});
+  };
+};

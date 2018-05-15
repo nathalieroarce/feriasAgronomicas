@@ -11,19 +11,11 @@ class Login extends Component
         username:'',
         password:''
     }
-
     doLogin = () =>
     {
-        console.log("Username"+this.username +"\nPassWord:"+this.password)
-
-        // validate in data base,
-        if(this.username== "julio" && this.password == 'kk')
-        {
-          this.props.navigation.navigate('HomeScreen');
-        }
-          this.props.navigation.navigate('HomeScreen');
+      // Validate user and password
+      this.props.navigation.navigate('HomeScreen');
     }
-
     render()
     {
         return(
@@ -39,12 +31,4 @@ class Login extends Component
         )
     }
 };
-export default createStackNavigator(
-  {
-    screen: Login
-  },
-  {
-    mode:'modal',
-    headerMode: 'none'
-  }
-);
+export default createStackNavigator({screen: Login},{mode:'modal',headerMode: 'none'});
