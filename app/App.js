@@ -27,24 +27,30 @@ export default class App extends Component
     }
 
     handleSearch = async () => {
+      console.log("Consultando");
         try
         {
             if(this.state.enterprisesID === -1 && this.state.soughtValue === 'none') {
-                /*const response = await fetch('http://localhost:8081/getEnterprises')
-                const data = await response.json();*/
-                console.log(this.state.requestType);
+                console.log("Empresas");
+                const response = await fetch('http://localhost:8081/getEnterprises');
+                const data = await response.json();
+                console.log(data);
+                this.setState({data:data});
                 this.setState({enterpriseID:1});
+                this.setState({requestType:'enterprises'});
             }
             else if(this.state.enterprisesID !== -1 && this.state.soughtValue === 'none'){
-                /*const response = await fetch('http://localhost:8081//getEnterpriseProducts/'+this.state.enterprisesID)
-                const data = await response.json();*/
+                const response = await fetch('http://localhost:8081/getEnterpriseProducts/'+this.state.enterprisesID);
+                const data = await response.json();
+                this.setState({data:data});
                 this.setState({requestType:'enterpriseProducts'});
-                console.log(this.state.requestType);
             }
             else{
-                /*const response = await fetch('http://localhost:8081//getProductsByKey/'+this.state.soughtValue+'/'+this.state.enterprisesID)
-                const data = await response.json();*/
-                console.log(this.state.requestType);
+                console.log("here");
+                const response = await fetch('http://localhost:8081/getProductsByKey/'+this.state.soughtValue+'/'+this.state.enterprisesID);
+                const data = await response.json();
+                this.setState({data:data});
+                this.setState({requestType:'enterpriseProducts'});
             }
         }
         catch (e)
@@ -53,11 +59,13 @@ export default class App extends Component
         }
     }
 
-    //setInterval(() => {this.handleSearch()}, 4000);
+    setInterval(() => {
+    this.handleSearch();
+    }, 5000);
 
     render()
       {
-          const data = [
+         /* const data = [
               {
                   o_image: 'http://www.vector-logo.net/logo_preview/ai/d/Del_Monte_logo.png',
                   o_enterprisename: 'Del Monte S. A.',
@@ -66,7 +74,8 @@ export default class App extends Component
                   o_locationname : 'Santa clara, San Carlos, Alajuela, Costa Rica',
                   o_price: 100,
                   o_unit: 'Kgg',
-              }];
+              }];*/
+
         return (
           <View style={styles.appContainer}>
             <Header style={{backgroundColor:'#4B610B'}}
@@ -82,7 +91,9 @@ export default class App extends Component
                 // onClear={someMethod}
                 placeholder='Buscar...'
             />
-            <SearchResults type = {this.state.requestType} data = {data} />
+              <View>
+                  <SearchResults type = {this.state.requestType} data = {this.state.data} />
+              </View>
           </ View>
         )
       }
