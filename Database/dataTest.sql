@@ -5,7 +5,9 @@ select sp_insertEnterprise('Empresa 2', 'https://es.freelogodesign.org/img/logo-
 	'112dydfe64', '2343-4242', false, 0, 'lugar','POINT(-71.060316 48.432044)', 'POINT(-71.060316 48.432044)');
 
 
-
+insert into orders (enterpriseID, clientID, totalAmount, directionName, observations, destinationAddress) 
+VALUES (1,2, 3566, 'San Jose', '-', ST_GeomFromText('POINT(-71.060316 48.432044)', 4326)),
+(2,5, 3566, 'San Carlos', '-', ST_GeomFromText('POINT(-71.060316 48.432044)', 4326));
 
 insert into productTypes(typeName) values ('Frutas'),('Legumbres'),('Vegetales');
 
