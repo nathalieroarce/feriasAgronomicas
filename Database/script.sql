@@ -1,4 +1,4 @@
-﻿/***********************************************************
+/***********************************************************
 DOMAINS
 ************************************************************/
 CREATE DOMAIN t_unit CHAR(1) NOT NULL CONSTRAINT
@@ -62,6 +62,40 @@ CREATE TABLE products
    CONSTRAINT products_PK_productID PRIMARY KEY (productID),
    CONSTRAINT products_FK_enterpriseID FOREIGN KEY (enterpriseID) REFERENCES enterprises(enterpriseID) ON DELETE CASCADE ON UPDATE CASCADE,
    CONSTRAINT products_FK_productType FOREIGN KEY (productType) REFERENCES productTypes(typeID) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+
+CREATE TABLE orders 
+(
+   orderID serial NOT NULL,
+   enterpriseID INTEGER NOT NULL,
+   clientID INTEGER NOT NULL,
+   expressService BOOLEAN NOT NULL DEFAULT FALSE,
+   totalAmount MONEY NOT NULL,
+   orderDate DATE NOT NULL DEFAULT CURRENT_DATE,
+   orderSent BOOLEAN NOT NULL DEFAULT FALSE,
+   deliveryDate DATE NOT NULL DEFAULT CURRENT_DATE,
+   accepted BOOLEAN NOT NULL DEFAULT TRUE,
+   directionName TEXT NOT NULL,
+   observations TEXT,
+
+   CONSTRAINT orders_PK_orderID PRIMARY KEY (orderID),
+   CONSTRAINT orders_FK_enterpriseID FOREIGN KEY (enterpriseID) REFERENCES enterprises(enterpriseID)ON DELETE CASCADE ON UPDATE CASCADE
+   --CONSTRAINT orders_FK_clientID FOREIGN KEY (clientID) REFERENCES clients(clientID) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+SELECT AddGeometryColumn('public','orders','destinationaddress', 4326, 'POINT',2); 
+
+
+CREATE TABLE notifications
+(
+	notificationID SERIAL NOT NULL,
+	clientID INTEGER NOT NULL,
+	message TEXT NOT NULL,
+	readNotification BOOLEAN NOT NULL DEFAULT FALSE,
+
+	CONSTRAINT notifications_PK_notificationID PRIMARY KEY (notificationID)
+	--CONSTRAINT notification_FK_clientID FOREIGN KEY (clientID) REFERENCES clients (clientID) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 /*****************************************************************
@@ -247,4 +281,97 @@ BEGIN
 END;
 $body$
 LANGUAGE plpgsql;
-	
+
+/***********************
+For table orders
+************************/	
+-- Get the orders of an enterprise 
+-- Require: The enterprise id
+-- Restrictions: None
+CREATE OR REPLACE FUNCTION sp_getPendingOrders
+(
+	IN i_enterpriseID INTEGER, 
+	OUT o_orderID INTEGER,
+	OUT o_expressService BOOLEAN,
+	OUT o_totalAmount MONEY,
+	OUT o_orderDate DATE, 
+	OUT o_directionName TEXT, 
+	OUT o_accepted BOOLEAN, 
+	OUT o_observations TEXT
+)
+RETURNS SETOF RECORD AS 
+$body$
+BEGIN
+	RETURN query
+	SELECT orderID, expressService, totalAmount, orderDate, directionName, accepted, observations FROM orders 
+	WHERE enterpriseID = i_enterpriseID AND orderSent = FALSE AND accepted = TRUE
+	ORDER BY orderDate DESC;
+	--EXCEPTION WHEN OTHERS THEN RETURN FALSE;
+END;
+$body$
+LANGUAGE plpgsql;
+
+-- Get the orders that are already delivered of an enterprise 
+-- Require: The enterprise id
+-- Restrictions: None
+CREATE OR REPLACE FUNCTION sp_getSentOrders
+(
+	IN i_enterpriseID INTEGER, 
+	OUT o_orderID INTEGER,
+	OUT o_expressService BOOLEAN,
+	OUT o_totalAmount MONEY,
+	OUT o_orderDate DATE, 
+	OUT o_directionName TEXT, 
+	OUT o_accepted BOOLEAN, 
+	OUT o_observations TEXT
+)
+RETURNS SETOF RECORD AS 
+$body$
+BEGIN
+	RETURN query
+	SELECT orderID, expressService, totalAmount, orderDate, directionName, accepted, observations FROM orders 
+	WHERE enterpriseID = i_enterpriseID AND orderSent = TRUE 
+	ORDER BY orderDate DESC;
+	--EXCEPTION WHEN OTHERS THEN RETURN FALSE;
+END;
+$body$
+LANGUAGE plpgsql;
+
+-- Check an order as sent 
+-- Require: The order id and the delivery date
+-- Restrictions: None
+CREATE OR REPLACE FUNCTION sp_sendOrder
+(
+	IN i_orderID INTEGER,
+	IN i_deliveryDate DATE
+)
+RETURNS BOOLEAN AS 
+$body$
+BEGIN
+	UPDATE orders SET (orderSent, deliveryDATE) = (TRUE, i_deliveryDate) WHERE orderID = i_orderID;
+	RETURN TRUE;
+	--EXCEPTION WHEN OTHERS THEN RETURN FALSE;
+END;
+$body$
+LANGUAGE plpgsql;
+
+-- Check an order as rejected  
+-- Require: The order id and the justification of why it was rejected
+-- Restrictions: None
+CREATE OR REPLACE FUNCTION sp_cancelOrder
+(
+	IN i_orderID INTEGER,
+	IN i_justification TEXT)
+RETURNS BOOLEAN AS 
+$body$
+DECLARE 
+	d_clientID INTEGER;
+BEGIN
+	SELECT clientID INTO d_clientID FROM orders WHERE orderID = i_orderID;
+	UPDATE orders set accepted = FALSE WHERE orderID = i_orderID;
+	INSERT INTO notifications (clientID,message) VALUES (d_clientID, i_justification);
+	RETURN TRUE;
+	--EXCEPTION WHEN OTHERS THEN RETURN FALSE;
+END;
+$body$
+LANGUAGE plpgsql;
