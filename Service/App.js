@@ -212,16 +212,17 @@ app.post('/registerEnterprise',function(req,res)
         else{
 
         	if (req.file) {
+        		console.log(req.body);
         		//upload image to service
         		uploadToService(req.file,enterpriseBucketName,function(response){
         				if (response.response===true){
         					//execute the store procedure
-
-        					//1 is an enterprise
+        					
         					db.func('sp_insertEnterprise',[req.body.name,response.imageUrl,req.body.description,req.body.responsableName,
         							req.body.responsableIDCardNumber,req.body.email,req.body.password,req.body.telephoneNumber,req.body.expressService,
-        							req.body.price,req.body.locationName,"POINT("+ req.body.enterpriseLocation[0]+" "+req.body.enterpriseLocation[1]+")",
-        							"POINT("+ req.body.enterpriseDeliveryPointLocation[0]+" "+req.body.enterpriseDeliveryPointLocation[1]+")"
+        							req.body.price,req.body.locationName,
+        							"POINT("+ req.body.enterpriseDeliveryPointLocation.split(",")[0]+" "+req.body.enterpriseDeliveryPointLocation.split(",")[1]+")",
+        							"POINT("+ req.body.enterpriseLocation.split(",")[0] +" "+req.body.enterpriseLocation.split(",")[1]+")"
         							])
 									.then(data => {
 										console.log(data);

@@ -69,6 +69,8 @@ export class EnterpriseRegistrationComponent implements OnInit {
    */
   public registerEnterprise(){
 
+    
+
     //check if passwords are not equals
     if ((document.getElementById("passw") as HTMLInputElement).value !=
         (document.getElementById("pass") as HTMLInputElement).value){
@@ -88,12 +90,16 @@ export class EnterpriseRegistrationComponent implements OnInit {
       ]
 
       if (this.checker.notNullValues(array)  == true && this.enterpriseImage!=undefined )  {
-        this.registeringEnterprise=true;
+
+        
         array.push(this.enterpriseLocation);
         array.push(this.enterpriseDeliveryPointLocation);
         array.push(this.provideExpress);
         array.push(this.enterpriseLocationName);
-       
+
+        this.registeringEnterprise=true;
+        
+
         this.enterpriseRegistrationService.registerEnterprise(this.enterpriseImage,array).subscribe(
           (res) =>{
             console.log("¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨***********+");
@@ -101,11 +107,11 @@ export class EnterpriseRegistrationComponent implements OnInit {
             console.log(res);
             console.log("¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨***********+");
             if (res.response === true){
-              this.userNotify.notify(3,"La emrpesa ha sido registrada", "Notificación del sistema");
+              this.userNotify.notify(3,"La empresa ha sido registrada", "Notificación del sistema");
               this.resetForm();
             }
             else{
-              this.userNotify.notify(1,res.message, "Notificación del sistema");
+              this.userNotify.notify(1,"Ocurrió un error en el registro de la empresa", "Notificación del sistema");
             }
             this.registeringEnterprise=false;
           },
@@ -129,6 +135,9 @@ export class EnterpriseRegistrationComponent implements OnInit {
    *        of the place that belongs to that location
    */
   public getNameOfPosition(position: Array<any>){
+
+ 
+
     var latlng = {
       lat: position[0],
       lng: position[1]
@@ -149,6 +158,7 @@ export class EnterpriseRegistrationComponent implements OnInit {
         else{
           this.userNotify.notify(1,"El registro no puede realizarse debido"+
           " a que no fue posible obtener el nombre del lugar donde se ubica la empresa","Notificación del sistema");
+
         }
       }
 });

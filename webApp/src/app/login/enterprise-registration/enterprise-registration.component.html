@@ -98,7 +98,8 @@
                     <button class="btn btn-primary"  (click)="initRegistration()"> Registrar </button>                  
                 </div>
 
-                <div *ngIf="registeringEnterprise===true" class="form-group">
+                <div *ngIf="registeringEnterprise" class="form-group">
+                <img  class="icon"  src="../../../assets/Images/uploading2.gif" alt="">
                     <span> Registrando la empresa ... </span>               
                 </div>
   

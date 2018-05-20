@@ -123,7 +123,7 @@ BEGIN
 			ST_GeomFromText(i_pointDeliveryOrders, 4326),
 			ST_GeomFromText(i_enterpriseLocation, 4326));
 	RETURN TRUE;
-	EXCEPTION WHEN OTHERS THEN RETURN FALSE;
+	
 END;
 $body$
 LANGUAGE plpgsql;

@@ -1,0 +1,77 @@
+<div class="container-fluid tOrders">
+    <br>
+    <h3>Gestión de pedidos </h3>
+    <br>
+    <div class="radio" style="display:inline-block;"  *ngFor="let item of filters">
+        <label>
+          <input type="radio" style="margin-left:12px;"  name="item" [(ngModel)]="currentItem" [value]="item.value" [checked]="item===currentItem"> 
+          {{ item.text}}
+        </label>
+    </div>
+    <div *ngIf="loadingOrders" class="form-group">
+        <img  class="icon" width="120" height="120"  src="../../../assets/Images/uploading2.gif" alt="">
+        <span> Cargando pedidos ... </span>               
+    </div>
+    <br><br>
+<div class="table-responsive">
+    
+    <table id="ordersTable" class="table table-hover">
+       <thead class="thead-dark">
+         <tr>
+           <th scope="col"> Dirección de entrega</th>
+           <th scope="col"> Fecha</th>
+           <th scope="col"> Servicio Express requerido</th>
+           <th scope="col"> Monto total</th>
+           <th scope="col"> Observaciones</th>
+           <th scope="col"> Acción </th>
+         </tr>
+
+       </thead>
+
+       <tr>
+          <td>direccion prueba</td>
+          <td> 30/12/1997</td>
+          <td> No</td>
+          <td> 3500 </td>
+          <td> cerca del supermercado</td>
+          <td> 
+              <div class="btn-group" role="group">
+                  <button type="button" class="btn btn-secondary">Enviar</button>
+                  <button type="button" class="btn btn-secondary">Cancelar</button>
+                </div>
+          </td>
+          
+       </tr>
+       <tr>
+          <td>direccion prueba</td>
+          <td> 30/12/1997</td>
+          <td> No</td>
+          <td> 3500 </td>
+          <td> cerca del supermercado</td>
+          <td> 
+              <div class="btn-group" role="group">
+                  <button type="button" class="btn btn-secondary">Enviar</button>
+                  <button type="button" class="btn btn-secondary">Cancelar</button>
+                </div>
+          </td>
+          
+       </tr>
+       <tr>
+          <td>direccion prueba</td>
+          <td> 30/12/1997</td>
+          <td> No</td>
+          <td> 3500 </td>
+          <td> Cerca del supermercado </td>
+          <td> 
+              <div class="btn-group" role="group">
+                  <button type="button" class="btn btn-secondary">Enviar</button>
+                  <button type="button" class="btn btn-secondary">Cancelar</button>
+                </div>
+          </td>
+          
+       </tr>
+      </table>
+
+</div>
+
+</div>
