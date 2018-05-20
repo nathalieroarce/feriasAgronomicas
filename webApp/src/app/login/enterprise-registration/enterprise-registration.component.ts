@@ -97,12 +97,8 @@ export class EnterpriseRegistrationComponent implements OnInit {
         array.push(this.provideExpress);
         array.push(this.enterpriseLocationName);
 
-<<<<<<< HEAD
         this.registeringEnterprise=true;
         
-
-=======
->>>>>>> 4e21f61ce8808c8421143319062e5bf70e895888
         this.enterpriseRegistrationService.registerEnterprise(this.enterpriseImage,array).subscribe(
           (res) =>{
             console.log("¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨***********+");
