@@ -6,10 +6,10 @@ import { userNotifications } from '../../models/userNotifications';
 import { EnterpriseRegistrationService } from '../../services/login/enterprise-registration.service';
 
 /**
- * Important to declare this var for get  
- * the name of the place according to 
+ * Important to declare this var for get
+ * the name of the place according to
  * latitude and longitude value
- * 
+ *
  */
 declare var google:any;
 
@@ -33,11 +33,11 @@ export class EnterpriseRegistrationComponent implements OnInit {
   private enterpriseImage: File;
   private pricePerKM:Number;
 
-  constructor(private enterpriseRegistrationService: EnterpriseRegistrationService) { 
+  constructor(private enterpriseRegistrationService: EnterpriseRegistrationService) {
     this.checker= new generalChecker();
     this.pricePerKM=0;
     this.registeringEnterprise=false;
-    this.userNotify= new userNotifications(); 
+    this.userNotify= new userNotifications();
     this.provideExpress=false;
     this.enterpriseLocation=new Array();
     this.enterpriseDeliveryPointLocation= new Array();
@@ -65,7 +65,7 @@ export class EnterpriseRegistrationComponent implements OnInit {
 
   /**
    * Go to register the company,
-   * 
+   *
    */
   public registerEnterprise(){
 
@@ -97,9 +97,12 @@ export class EnterpriseRegistrationComponent implements OnInit {
         array.push(this.provideExpress);
         array.push(this.enterpriseLocationName);
 
+<<<<<<< HEAD
         this.registeringEnterprise=true;
         
 
+=======
+>>>>>>> 4e21f61ce8808c8421143319062e5bf70e895888
         this.enterpriseRegistrationService.registerEnterprise(this.enterpriseImage,array).subscribe(
           (res) =>{
             console.log("¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨***********+");
@@ -116,7 +119,7 @@ export class EnterpriseRegistrationComponent implements OnInit {
             this.registeringEnterprise=false;
           },
           (err) => {
-            console.log(err.json());   
+            console.log(err.json());
             this.registeringEnterprise=false;
           });
     }
@@ -124,14 +127,14 @@ export class EnterpriseRegistrationComponent implements OnInit {
       this.userNotify.notify(1,"Algún campo del formulario se encuentra vacío","Notificación del sistema");
     }
   }
-  
+
   public initRegistration(){
     this.getNameOfPosition(this.enterpriseLocation);
   }
 
   /**
    * get the name of the place that latitude and longitude represent
-   * @param position represent the enterprise location to then obtain the name 
+   * @param position represent the enterprise location to then obtain the name
    *        of the place that belongs to that location
    */
   public getNameOfPosition(position: Array<any>){
@@ -181,7 +184,7 @@ export class EnterpriseRegistrationComponent implements OnInit {
 
 
   /**
-   * 
+   *
   * @param event contains files that are selected
    */
   public fileChangeEvent(event){
@@ -195,7 +198,7 @@ export class EnterpriseRegistrationComponent implements OnInit {
 
 
   /**
-   * 
+   *
    * @param locationEvent contains the latitude and logitud clicked
    * @param enterpriseLocation to know is the change  of location was in enterprise location or
    * in delivery point
@@ -209,7 +212,7 @@ export class EnterpriseRegistrationComponent implements OnInit {
       this.enterpriseDeliveryPointLocation[0]= locationEvent.coords.lat;
       this.enterpriseDeliveryPointLocation[1]= locationEvent.coords.lng;
     }
-   
+
   }
 
   ngOnInit() {
