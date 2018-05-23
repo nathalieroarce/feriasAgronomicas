@@ -8,6 +8,7 @@ import { MainViewComponent } from './main-view/main-view.component';
 import { ProductsManagementService } from '../services/administrador-view/products-management.service';
 import { OrdersViewComponent } from './orders-view/orders-view.component';
 import { EnterpriseProfileComponent } from './enterprise-profile/enterprise-profile.component';
+import { OrdersService } from '../services/administrador-view/orders.service';
 
 const routes: Routes = [
   { path: 'main', component: MainViewComponent, children: [
@@ -27,6 +28,6 @@ const routes: Routes = [
     RouterModule.forChild(routes),
   ],
   declarations: [ProductsRegistrationComponent, MainViewComponent, OrdersViewComponent, EnterpriseProfileComponent],
-  providers: [ProductsManagementService]
+  providers: [ProductsManagementService, OrdersService]
 })
 export class AdministratorViewModule { }

@@ -67,7 +67,7 @@ export class EnterpriseRegistrationComponent implements OnInit {
    * Go to register the company,
    *
    */
-  public registerEnterprise(){
+  public registerEnterprise(environment){
 
     
 
@@ -97,7 +97,7 @@ export class EnterpriseRegistrationComponent implements OnInit {
         array.push(this.provideExpress);
         array.push(this.enterpriseLocationName);
 
-        this.registeringEnterprise=true;
+        environment.registeringEnterprise=true;
         
         this.enterpriseRegistrationService.registerEnterprise(this.enterpriseImage,array).subscribe(
           (res) =>{
@@ -112,11 +112,11 @@ export class EnterpriseRegistrationComponent implements OnInit {
             else{
               this.userNotify.notify(1,"Ocurrió un error en el registro de la empresa", "Notificación del sistema");
             }
-            this.registeringEnterprise=false;
+            environment.registeringEnterprise=false;
           },
           (err) => {
             console.log(err.json());
-            this.registeringEnterprise=false;
+            environment.registeringEnterprise=false;
           });
     }
     else{
@@ -152,7 +152,7 @@ export class EnterpriseRegistrationComponent implements OnInit {
         // si encontró algún resultado.
         if (results[1]) {
           that.enterpriseLocationName= results[1].formatted_address;
-          that.registerEnterprise();
+          that.registerEnterprise(that);
         }
         else{
           this.userNotify.notify(1,"El registro no puede realizarse debido"+

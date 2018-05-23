@@ -1,12 +1,12 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark" style="background-color:black;">
   
-  <a class="navbar-brand" href="#">
+  <a class="navbar-brand">
   <img  class="icon" height="60px"  src="../../../assets/Images/appIcon.jpg" alt=""> 
 
-              </a>
+  </a>
   
-  <a class="navbar-brand" href="#">Ferias Agronómicas</a>
+  <a class="navbar-brand" style="color:white">Ferias Agronómicas</a>
 
 
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -20,7 +20,7 @@
           Gestion de productos
         </a>
         <div class="dropdown-menu" aria-labelledby="productsMenu">
-          <a class="dropdown-item" style=":blue;" [routerLink]="[ {outlets: {'administrator': ['registerProduct']}}]" > Registrar producto</a>
+          <a class="dropdown-item" [routerLink]="[ {outlets: {'administrator': ['registerProduct']}}]" > Registrar producto</a>
           <a class="dropdown-item" href="#">Mis productos</a>
         </div>
       </li>

@@ -1,4 +1,4 @@
-/***********************************************************
+﻿/***********************************************************
 DOMAINS
 ************************************************************/
 CREATE DOMAIN t_unit CHAR(1) NOT NULL CONSTRAINT
@@ -93,7 +93,7 @@ CREATE TABLE notifications
 	clientID INTEGER NOT NULL,
 	message TEXT NOT NULL,
 	readNotification BOOLEAN NOT NULL DEFAULT FALSE,
-
+	generatedDate DATE NOT NULL DEFAULT (CURRENT_TIMESTAMP),
 	CONSTRAINT notifications_PK_notificationID PRIMARY KEY (notificationID)
 	--CONSTRAINT notification_FK_clientID FOREIGN KEY (clientID) REFERENCES clients (clientID) ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -220,6 +220,8 @@ END;
 $body$
 LANGUAGE plpgsql;
 
+
+
 -- Get product's information related with an enterprise
 -- Require: enterpriseID
 -- Restrictions: If product's stock is less than 0, product information isn't going to be returned
@@ -310,6 +312,7 @@ BEGIN
 END;
 $body$
 LANGUAGE plpgsql;
+
 
 -- Get the orders that are already delivered of an enterprise 
 -- Require: The enterprise id

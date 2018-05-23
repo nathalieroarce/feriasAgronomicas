@@ -5,7 +5,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { EnterpriseRegistrationComponent } from './enterprise-registration/enterprise-registration.component';
 import { AgmCoreModule } from '@agm/core';
 //import globals vars
-import * as globalsVars from '../../../globals';
+import * as globalsVars from '../../globals';
 import { FormsModule } from '@angular/forms';
 import { EnterpriseRegistrationService } from '../services/login/enterprise-registration.service';
 

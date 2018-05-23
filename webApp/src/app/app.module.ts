@@ -20,7 +20,7 @@ import { Routes, RouterModule } from '@angular/router';
 
 //here is necesary to set all module routes
 const routes: Routes = [
-  { path: '',loadChildren: './login/login.module#LoginModule' , pathMatch: 'full'},
+  { path: '',loadChildren: './login/login.module#LoginModule'},
   { path: 'enterpriseView',loadChildren: './administrator-view/administrator-view.module#AdministratorViewModule'}
 ];
 const routerModule = RouterModule.forRoot(routes);

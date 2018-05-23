@@ -1,6 +1,6 @@
 
 var pg = require('pg');
-var conString = "postgres://postgres:postgresql2017@localhost:5432/agriculturalfairs";
+var conString = "postgres://postgres:12345@localhost:5432/agriculturalfairs";
 var client;
 var fs = require('fs');
 var express = require('express');
@@ -36,7 +36,7 @@ const storageMulter = multer.diskStorage({
 const upload = multer({ storage: storageMulter }).single('image');
 
 var pgp = require('pg-promise')();
-var cn = {host: 'localhost', port: 5432, database: 'agriculturalfairs', user: 'postgres', password: 'postgresql2017'};
+var cn = {host: 'localhost', port: 5432, database: 'agriculturalfairs', user: 'postgres', password: '12345'};
 var db = pgp(cn);
 
 
@@ -313,6 +313,62 @@ app.get('/getProductsByKey',function(req,res)
 
 });
 
+app.get('/getPendingOrders',function(req,res)
+{
+	db.func('sp_getPendingOrders',[req.query.enterpriseID])
+		.then(data => {
+			console.log(data);
+			res.end(JSON.stringify({response:true, "data": data } ) );
+			})
+		  .catch(error=> {
+		    console.log("ERROR: ",error);
+		    res.end(JSON.stringify({ response:false,"data":[]}));})
+
+});
+
+
+app.get('/getSentOrders',function(req,res)
+{
+	db.func('sp_getSentOrders',[req.query.enterpriseID])
+		.then(data => {
+			console.log(data);
+			res.end(JSON.stringify({response:true, "data": data } ) );
+			})
+		  .catch(error=> {
+		    console.log("ERROR: ",error);
+		    res.end(JSON.stringify({ response:false,"data":[]}));})
+
+});
+
+app.post('/sendOrder',function(req,res)
+{
+	console.log("body");
+	console.log(req.body);
+	db.func('sp_sendOrder',[req.body.orderID,req.body.deliveryDate])
+		.then(data => {
+			console.log(data);
+			res.end(JSON.stringify({response:data[0].sp_sendorder} ) );
+			})
+		  .catch(error=> {
+		    console.log("ERROR: ",error);
+		    res.end(JSON.stringify({ response:false}))
+		})
+
+});
+
+
+app.post('/cancelOrder',function(req,res)
+{
+	db.func('sp_cancelOrder',[req.body.orderID,req.body.justification])
+		.then(data => {
+			console.log(data);
+			res.end(JSON.stringify({response:data[0].sp_cancelorder} ) );
+			})
+		  .catch(error=> {
+		    console.log("ERROR: ",error);
+		    res.end(JSON.stringify({ response:false}))})
+
+});
 
 var server = app.listen(8081, function ()
 {

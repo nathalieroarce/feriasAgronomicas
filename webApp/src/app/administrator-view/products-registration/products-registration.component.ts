@@ -4,7 +4,7 @@ import { generalChecker } from '../../models/generalChecker';
 import { userNotifications } from '../../models/userNotifications';
 
 //import globals vars
-import * as globalsVars from '../../../../globals';
+import * as globalsVars from '../../../globals';
 import { FormGroup } from '@angular/forms';
 
 declare var swal:any;
