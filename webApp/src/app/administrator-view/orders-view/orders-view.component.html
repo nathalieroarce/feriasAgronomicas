@@ -42,10 +42,11 @@
               <div class="btn-group" role="group">
                   <button type="button" (click)="setAction(order.orderID,true)" class="btn btn-secondary"
                   data-toggle="modal" data-target="#orderActionModal" >Enviar</button>
-                  <button type="button" (mousedown)="setAction(order.orderID,false)" class="btn btn-secondary"
+                  <button type="button" (click)="setAction(order.orderID,false)" class="btn btn-secondary"
                   data-toggle="modal" data-target="#orderActionModal">Rechazar</button>
                 </div>
           </td>
+          
           
        </tr>
       </table>

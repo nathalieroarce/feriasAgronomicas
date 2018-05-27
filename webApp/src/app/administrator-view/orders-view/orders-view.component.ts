@@ -36,11 +36,12 @@ export class OrdersViewComponent implements OnInit {
   }
 
   public loadOrders(){
-   
+    
     if (this.currentItem== true){
       this.orders.getOrders("getSentOrders",this.enterpriseID).then();
       
     }
+
     else{
       this.orders.getOrders("getPendingOrders",this.enterpriseID).then();
     }
@@ -59,7 +60,7 @@ export class OrdersViewComponent implements OnInit {
     }
     else{
 
-      this.orders.sendOrder(this.orderID,this.clientDeliveryDate).then(response =>{
+      this.orders.sendOrder(this.orderID,this.clientDeliveryDate).then (response => {
         
         if (response===false){
           this.userNotify.notify(1,"No ha sido posible marcar el pedido como enviado", "Notificación del sistema");

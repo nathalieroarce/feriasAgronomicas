@@ -87,6 +87,20 @@ CREATE TABLE orders
 SELECT AddGeometryColumn('public','orders','destinationaddress', 4326, 'POINT',2); 
 
 
+CREATE TABLE orderProducts
+(
+   orderID INTEGER,
+   productID INTEGER,
+   price Money,
+   purchasedAmount SMALLINT,
+   totalAmount MONEY,
+   CONSTRAINT orderProducts_PK_orderID_prodcuctID PRIMARY KEY (orderID,productID),
+   CONSTRAINT orderProcucts_FK_orderID FOREIGN KEY (orderID) REFERENCES orders(orderID) ON DELETE CASCADE ON UPDATE CASCADE,
+   CONSTRAINT orderProcucts_FK_productID FOREIGN KEY (productID) REFERENCES products(productID) ON DELETE CASCADE ON UPDATE CASCADE
+   
+)
+
+
 CREATE TABLE notifications
 (
 	notificationID SERIAL NOT NULL,
@@ -374,6 +388,88 @@ BEGIN
 	UPDATE orders set accepted = FALSE WHERE orderID = i_orderID;
 	INSERT INTO notifications (clientID,message) VALUES (d_clientID, i_justification);
 	RETURN TRUE;
+	--EXCEPTION WHEN OTHERS THEN RETURN FALSE;
+END;
+$body$
+LANGUAGE plpgsql;
+
+
+-- Get order's product by orderID 
+-- Require: The order id
+-- Restrictions: None
+CREATE OR REPLACE FUNCTION sp_getOrderProducts
+(
+	IN i_orderID INTEGER, 
+	OUT o_name TEXT,
+	OUT o_price Money,
+	OUT o_purchasedAmount SMALLINT,
+	OUT o_totalAmount MONEY
+)
+RETURNS SETOF RECORD AS 
+$body$
+BEGIN
+	RETURN query
+	SELECT p.productName,op.price, op.purchasedAmount, op.totalAmount FROM
+	(SELECT * FROM orderProducts WHERE orderID= i_orderID ) AS op
+	INNER JOIN products AS p ON op.productID= p.productID;
+	
+	--EXCEPTION WHEN OTHERS THEN RETURN FALSE;
+END;
+$body$
+LANGUAGE plpgsql;
+
+
+-- Get enterprise's prducts by type
+-- Require: The type ID and the enrepriseID
+-- Restrictions: None
+CREATE OR REPLACE FUNCTION sp_getProductsByType
+(
+	IN i_productTypeID INTEGER,
+	IN i_enterpriseID INTEGER,
+	OUT o_ID INTEGER, 
+	OUT o_name TEXT,
+	OUT o_price Money,
+	OUT o_unit t_unit,
+	OUT o_image TEXT,
+	OUT o_description TEXT,
+	OUT o_stock INTEGER
+)
+
+RETURNS SETOF RECORD AS 
+$body$
+BEGIN
+	RETURN query
+	SELECT p.productID, p.productName, p.price,p.unit,p.image, p.description , p.stock  FROM 
+	(SELECT productID,productName,price,unit,image, productType ,description , stock FROM products WHERE enterpriseID = i_enterpriseID AND stock > 0) AS p
+	WHERE p.productType = i_productTypeID;
+	
+	--EXCEPTION WHEN OTHERS THEN RETURN FALSE;
+END;
+$body$
+LANGUAGE plpgsql;
+
+
+-- Get order's product by orderID 
+-- Require: The order id
+-- Restrictions: None
+CREATE OR REPLACE FUNCTION sp_updateProductInformation
+(
+	IN i_productID INTEGER, 
+	IN i_name TEXT,
+	IN i_price INTEGER,
+	IN i_unit t_unit,
+	IN i_image TEXT,
+	IN i_stock INTEGER,
+	IN i_description TEXT
+)
+
+RETURNS BOOLEAN AS
+$body$
+BEGIN
+	UPDATE products SET (productName,price,unit,image,stock,description)= (i_name,i_price,i_unit,i_image,i_stock,i_description)
+	WHERE productID= i_productID;
+	RETURN TRUE;
+	
 	--EXCEPTION WHEN OTHERS THEN RETURN FALSE;
 END;
 $body$

@@ -18,7 +18,6 @@ export class ProductsManagementService {
       res.json()); 
   }
 
-
   public registerProduct(image:File, data: Array<any>){
     
     const formData: FormData = new FormData();

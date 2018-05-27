@@ -76,8 +76,7 @@ export class OrdersService {
     }
 
   public cancelOrder(orderID:Number, justification: String){
-    let that=this;
-
+    
     let headers = new Headers({"Content-Type": "application/json"});
     let options = new RequestOptions({headers: headers});
 
@@ -99,7 +98,6 @@ export class OrdersService {
   }
 
   public sendOrder(orderID:Number, deliveryDate:Date){
-    let that=this;
   
     let headers = new Headers({"Content-Type": "application/json"});
     let options = new RequestOptions({headers: headers});
@@ -110,7 +108,6 @@ export class OrdersService {
           .toPromise()
           .then(
               res => { // Success
-              
                 resolve(res.json().response); //notify that the process was successful
               },
               msg => { // Error

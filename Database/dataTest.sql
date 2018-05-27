@@ -46,3 +46,18 @@ insert into products(
   (2,'Piña','00rt',600,'U','https://storage.googleapis.com/feriasagronomicasproductos/1525918318224mango-transportado-en-avion.jpg.jpg',1,'Piña del atlántico',10);
 
 select * from orders
+
+select * from productTypes
+
+select * from products
+
+select * from orderProducts
+-- para pruebas
+insert into orderProducts(orderID,productID,price, purchasedAmount, totalAmount) VALUES
+(10, 1, 4545,2 , 4545*2),
+(10, 2, 6000, 3, 6000*3 ),
+(10, 3, 2000, 4, 2000*4),
+(10, 7, 3000, 5,3000*5 )
+
+select * from enterprises
+

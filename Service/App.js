@@ -20,7 +20,7 @@ var folderDirection= "./TemporalImages/";
 
 var serviceUrl="https://storage.googleapis.com/";
 
-
+/*
 const storageMulter = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, './TemporalImages');
@@ -32,8 +32,14 @@ const storageMulter = multer.diskStorage({
     cb(null, Date.now()+ file.originalname + path.extname(file.originalname));
   }
 });
+*/
 
+/*
 const upload = multer({ storage: storageMulter }).single('image');
+*/
+
+var storage = multer.memoryStorage();
+var upload = multer({ storage: storage }).single('image');
 
 var pgp = require('pg-promise')();
 var cn = {host: 'localhost', port: 5432, database: 'agriculturalfairs', user: 'postgres', password: '12345'};
@@ -59,6 +65,7 @@ var storage = GoogleCloudStorage({
   projectId: '57822770845ad25617586e7afc5bab6054b3bccf',
   keyFilename: './feriasAgronomicas-key.json'
 })
+
 
 
 /******************************************************************
@@ -88,6 +95,41 @@ function uploadToService(fileInformation,toBucket,callback){
 
 				});
 }
+
+function uploadImageToService(coverImageData,originalName, mimeType, toBucket, callback) {
+
+ 
+  var myBucket = storage.bucket(toBucket);
+  // Generate a unique filename for this image
+  var filename = '' + new Date().getTime() + "-" + Math.random() +path.extname(originalName);
+  var file = myBucket.file(filename);
+  var imageUrl = serviceUrl+ toBucket +"/"+ filename;
+  var stream = file.createWriteStream(
+  	{
+    metadata: {
+      contentType: mimeType
+     } });
+  stream.on('error', function(){ callback(true,null)});
+  stream.on('finish', function() {
+    // Set this file to be publicly readable
+    console.log("archivo guardado");
+
+    file.makePublic(function(err) {
+      if (err){
+      	 	console.log(err);
+      	    callback(true,null);
+  			}
+  	   else{
+  	   		callback(false,imageUrl);
+  	   }		
+      		
+   	 });
+   	
+  	});
+
+  stream.end(coverImageData);
+}
+
 
 
 function deleteImageFromLocal(imageUrl){
@@ -155,6 +197,7 @@ app.get('/getProductsTypes', async (req, res) => {
 
 app.post('/registerProduct',function(req,res)
 {
+	
 	console.log("registrar Producto");
 	upload(req,res, function (err) {
         if (err) {
@@ -163,13 +206,14 @@ app.post('/registerProduct',function(req,res)
         else{
 
         	if (req.file) {
-        		//upload image to service
-        		uploadToService(req.file,productsBucketName,function(response){
-        				if (response.response===true){
+        		var coverImageData = req.file.buffer;
+
+        		uploadImageToService(coverImageData,req.file.originalname, req.file.mimetype ,productsBucketName,function(error,imageUrl){
+        			if (error===false){
         					//execute the store procedure
 
         					//1 is an enterprise
-        					db.func('sp_insertProduct',[req.body.enterpriseID,req.body.name,req.body.code,req.body.price,req.body.unit,response.imageUrl,
+        					db.func('sp_insertProduct',[req.body.enterpriseID,req.body.name,req.body.code,req.body.price,req.body.unit,imageUrl,
         										req.body.productType, req.body.description, req.body.stock])
 									.then(data => {
 										console.log(data);
@@ -185,11 +229,9 @@ app.post('/registerProduct',function(req,res)
         				else{
         					res.end(JSON.stringify({response:false,message: "El proceso de carga de la imagen no fue existoso"}));
         				}
+        		});
 
-        				deleteImageFromLocal(folderDirection+"/"+ req.file.filename);
-
-        		})
-
+        	
         	  }
 
 			else{
@@ -199,6 +241,7 @@ app.post('/registerProduct',function(req,res)
 		}
 
     });
+	   
 
     });
 
@@ -369,6 +412,87 @@ app.post('/cancelOrder',function(req,res)
 		    res.end(JSON.stringify({ response:false}))})
 
 });
+
+
+/*******
+FOR PRODUCTS MANAGEMENT (UPDATE AND GET)
+********/
+
+app.get('/getProductsByType',function(req,res)
+{
+	db.func('sp_getProductsByType',[req.query.productType,req.query.enterpriseID])
+		.then(data => {
+			console.log(data);
+			res.end(JSON.stringify({response:true, "data": data } ) );
+			})
+		  .catch(error=> {
+		    console.log("ERROR: ",error);
+		    res.end(JSON.stringify({ response:false,"data":[]}));})
+
+});
+
+app.post('/updateProductInformation',function(req,res)
+{
+	upload(req,res, function (err) {
+        if (err) {
+        	console.log(err);
+            res.end(JSON.stringify({response:false,message: "El proceso de carga de la imagen no fue exitoso"}));
+        }
+        else{
+
+        	if (req.file) {
+        		var coverImageData = req.file.buffer;
+
+        		uploadImageToService(coverImageData,req.file.originalname, req.file.mimetype ,productsBucketName,function(error,imageUrl){
+        			if (error===false){
+        					//execute the store procedure
+
+        					//1 is an enterprise
+        					db.func('sp_updateProductInformation',[req.body.productID, req.body.name,req.body.price,req.body.unit,imageUrl,req.body.stock,req.body.description])
+								.then(data => {
+									console.log(data);
+									res.end(JSON.stringify({response:data[0].sp_updateproductinformation} ) );
+									})
+		  						.catch(f_error=> {
+								    console.log("ERROR: ",f_error);
+								    res.end(JSON.stringify({ response:false}))})
+
+        						}
+
+        				else{
+        					console.log(error);
+        					res.end(JSON.stringify({response:false,message: "El proceso de carga de la imagen no fue existoso"}));
+        				}
+        		});
+
+        	
+        	  }
+
+			else{
+				res.end(JSON.stringify({response:false,message: "El proceso de carga de la imagen no fue existoso"}));
+
+			}
+		}
+
+    });
+	
+
+});
+
+app.get('/getOrderProducts',function(req,res)
+{
+	db.func('sp_getOrderProducts',[req.query.orderID])
+		.then(data => {
+			console.log(data);
+			res.end(JSON.stringify({response:true, "data": data } ) );
+			})
+		  .catch(error=> {
+		    console.log("ERROR: ",error);
+		    res.end(JSON.stringify({ response:false,"data":[]}));})
+
+});
+
+
 
 var server = app.listen(8081, function ()
 {
