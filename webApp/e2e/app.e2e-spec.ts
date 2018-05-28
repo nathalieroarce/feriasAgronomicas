@@ -1,6 +1,6 @@
 import { AppPage } from './app.po';
 
-describe('web-app App', () => {
+describe('othello-game App', () => {
   let page: AppPage;
 
   beforeEach(() => {

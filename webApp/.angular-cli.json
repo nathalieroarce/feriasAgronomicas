@@ -1,7 +1,7 @@
 {
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "project": {
-    "name": "web-app"
+    "name": "othello-game"
   },
   "apps": [
     {
@@ -57,4 +57,5 @@
     "styleExt": "css",
     "component": {}
   }
+  
 }

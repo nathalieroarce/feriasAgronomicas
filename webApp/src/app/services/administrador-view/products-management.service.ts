@@ -4,7 +4,7 @@ import {HttpClient,HttpHeaders} from '@angular/common/http';
 
 import 'rxjs/add/operator/map';
 //import globals vars
-import * as globalVars from '../../../../globals';
+import * as globalVars from '../../../globals';
 @Injectable()
 export class ProductsManagementService {
 
@@ -17,7 +17,6 @@ export class ProductsManagementService {
     .map(res => 
       res.json()); 
   }
-
 
   public registerProduct(image:File, data: Array<any>){
     
