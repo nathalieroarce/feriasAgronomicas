@@ -159,40 +159,15 @@ END;
 $body$
 LANGUAGE plpgsql;
 
--- Get product's information related with an enterprise
--- Require: enterpriseID
--- Restrictions: If product's stock is less than 0, product information isn't going to be returned
-CREATE OR REPLACE FUNCTION sp_getProductsByEnterpriseID
-(
-	IN i_enterpriseID INTEGER,
-	OUT o_enterpriseID INTEGER,
-	OUT o_productID INTEGER,
-	OUT o_productName TEXT,
-	OUT o_price MONEY,
-	OUT o_productImage TEXT,
-	OUT o_productUnit t_unit,
-	OUT o_productDescription TEXT,
-	OUT o_productStock INTEGER
-)
-RETURNS
-SETOF RECORD AS
-$body$
-BEGIN
-	RETURN query SELECT p.* FROM
-	(SELECT enterpriseID,productID, productName, price,image,unit,description,stock  FROM products WHERE enterpriseID=i_enterpriseID) AS p
-	 WHERE p.stock > 0;
 
-END;
-$body$
-LANGUAGE plpgsql;
 
 -- Get product's information related with an enterprise
 -- Require: enterpriseID
 -- Restrictions: If product's stock is less than 0, product information isn't going to be returned
 CREATE OR REPLACE FUNCTION sp_getEnterprises
-(	
-	OUT o_enterpriceid INTEGER,
-	OUT o_enterpricename VARCHAR,
+(
+	OUT o_id INTEGER,
+	OUT o_name VARCHAR,
 	OUT o_logo TEXT,
 	OUT o_locationname VARCHAR
 )
@@ -205,6 +180,41 @@ END;
 $body$
 LANGUAGE plpgsql;
 
+-- Get product's information related with an enterprise
+-- Require: enterpriseID
+-- Restrictions: If product's stock is less than 0, product information isn't going to be returned
+CREATE OR REPLACE FUNCTION sp_getProductsByEnterpriseID
+(
+	IN i_enterpriseID INTEGER,
+	
+	OUT o_enterpriseID INTEGER,
+	OUT o_id INTEGER,
+	OUT o_name TEXT,
+	OUT o_price MONEY,
+	OUT o_image TEXT,
+	OUT o_unit t_unit,
+	OUT o_description TEXT,
+	OUT o_stock INTEGER,
+	OUT o_enterprisename VARCHAR(50)
+)
+RETURNS
+SETOF RECORD AS
+$body$
+BEGIN
+	RETURN query (
+		SELECT enterprises.enterpriseID,productID, productName, price,image,unit,products.description,stock, enterprisename  		
+		FROM 
+		products 
+		INNER JOIN  
+		enterprises
+		ON enterprises.enterpriseID=products.enterpriseID
+		
+		WHERE enterprises.enterpriseID = i_enterpriseID and stock > 0);
+END;
+$body$
+LANGUAGE plpgsql;
+
+DROP FUNCTION sp_getproductsbykey(text,integer)
 
 
 -- Get product's information related with an enterprise
@@ -213,38 +223,45 @@ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION sp_getProductsByKey
 (
 	IN  i_key TEXT,
-	IN  i_enterpriseID INTEGER,
-	
-	OUT o_productid INTEGER,
+	IN  i_enterpriseID INT,
+	OUT o_id INTEGER,
 	OUT o_enterpriseid INTEGER,
-	OUT o_productname TEXT,	
+	OUT o_name TEXT,
 	OUT o_price MONEY,
 	OUT o_unit  t_unit,
 	OUT o_image TEXT,
-	OUT o_description TEXT	
+	OUT o_description TEXT,
+	OUT o_stock INTEGER,
+	OUT o_enterprisename VARCHAR(50)
 )
 RETURNS
 SETOF RECORD AS
 $body$
 BEGIN
 	IF i_enterpriseID = -1 THEN
-		RETURN query 
-		(SELECT productid, enterpriseid, productname, price, unit, image, description FROM 
-			products 
+		RETURN query
+		(SELECT productid, products.enterpriseid, productname, price, unit, image, products.description,stock,enterprisename  FROM
+			products
 			INNER JOIN
-			producttypes	
+			producttypes
 			ON producttype = typeid
-			WHERE stock > 0  and (typename LIKE '%'||i_key||'%' OR productname LIKE '%'||i_key||'%')    ); 
+			INNER JOIN
+			enterprises
+			ON enterprises.enterpriseID = products.enterpriseid
+			WHERE stock > 0  and (typename LIKE '%'||i_key||'%' OR lower(productname) LIKE '%'||lower(i_key)||'%')    );
 	ELSE
-		RETURN query 
-		(SELECT productid, enterpriseid, productname, price, unit, image, description FROM 
-			(SELECT * FROM products WHERE enterpriseid= i_enterpriseID) as a
-			INNER JOIN
-			producttypes	
-			ON producttype = typeid
-			WHERE stock > 0  and (typename LIKE '%'||i_key||'%' OR productname LIKE '%'||i_key||'%')    ); 
+		RETURN query
+			(SELECT productid, a.enterpriseid, productname, price, unit, image, a.description,stock,enterprisename 
+				FROM
+					(SELECT * FROM products WHERE enterpriseid= i_enterpriseID) as a
+				INNER JOIN
+					(SELECT * FROM enterprises where enterpriseID = i_enterpriseID ) as e 
+				ON a.enterpriseid = e.enterpriseID
+				INNER JOIN				
+					producttypes
+				ON producttype = typeid
+			WHERE stock > 0  and (typename LIKE '%'||i_key||'%' OR lower(productname) LIKE '%'||lower(i_key)||'%')    );
 	END IF;
 END;
 $body$
 LANGUAGE plpgsql;
-	

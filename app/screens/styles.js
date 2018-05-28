@@ -6,6 +6,9 @@ var {
   StyleSheet,
 } = React;
 
+
+
+
 module.exports = StyleSheet.create({
   container: {
     flex: 1,
@@ -31,10 +34,9 @@ module.exports = StyleSheet.create({
   },
   button:
   {
-      backgroundColor: 'white',
-      width: 200,
-      padding:10,
-      margin: 20,
+      backgroundColor: 'white',      
+      marginLeft:20,
+      paddingLeft:20,
   },
   text:
   {
@@ -48,16 +50,25 @@ module.exports = StyleSheet.create({
     width: 70,
     height: 70,
   },
+  image2: {
+    width: 200,
+    height: 200,
+  },
   row: {
     flexDirection: 'row',
     padding: 15,
     marginBottom: 5,
     backgroundColor: '#E6E6E6',
   },
+  rowContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#E6E6E6',
+    alignContent: 'center',
+    justifyContent: 'space-evenly'
+  },
   rowContent: {
-    paddingLeft: 40,
+    paddingLeft: 30,
     flexDirection: 'column',
-    flex: 1,
     justifyContent: 'center',
     alignContent: 'center',
   },
@@ -65,4 +76,20 @@ module.exports = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
   },
+  title:
+  {
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  ligthTitle:
+  {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  buttonContent:
+  {
+    flexDirection: 'row',
+    backgroundColor: '#E6E6E6',
+  }
 });
