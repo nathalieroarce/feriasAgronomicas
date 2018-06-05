@@ -328,6 +328,7 @@ $body$
 LANGUAGE plpgsql;
 
 
+
 -- Get the orders that are already delivered of an enterprise 
 -- Require: The enterprise id
 -- Restrictions: None
@@ -353,6 +354,7 @@ BEGIN
 END;
 $body$
 LANGUAGE plpgsql;
+
 
 -- Check an order as sent 
 -- Require: The order id and the delivery date

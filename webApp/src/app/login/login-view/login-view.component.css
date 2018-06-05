@@ -1,0 +1,31 @@
+.loginDiv{
+    width: 45%;
+    height: 45%;
+    margin-top: 3%;
+    color: black;
+    background-color: gainsboro;
+    opacity: 0.6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.body{
+background-image: url("../../../assets/Images/login.jpg");
+}
+
+.form{
+  border-color: black;
+  border: 4px;
+  width: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+
+
+  .enterpriseLink{
+    cursor: pointer;
+  }

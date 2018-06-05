@@ -77,10 +77,7 @@ export class ProductsRegistrationComponent implements OnInit {
        
         this.productsService.registerProduct(this.productImage,array).subscribe(
           (res) =>{
-            console.log("¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨***********+");
-            console.log("res");
-            console.log(res);
-            console.log("¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨***********+");
+            
             if (res.response === true){
               this.userNotify.notify(3,"El producto ha sido registrado", "Notificación del sistema");
               this.resetForm();

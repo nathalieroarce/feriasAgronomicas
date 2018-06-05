@@ -26,6 +26,18 @@ export class AppComponent {
     });
   }
 
+  /*
+  Only for testing
+  */
+  public isEven(num: number){
+    if ( num % 2===0){
+      return true;
+    }
+    else{
+      return false;
+    }
+  }
+
   public changeLocation(locationEvent:any){
     this.lat=locationEvent.coords.lat;
     this.lng= locationEvent.coords.lng;

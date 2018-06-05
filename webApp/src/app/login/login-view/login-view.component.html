@@ -1,3 +1,51 @@
-<p>
-  login-view works!
-</p>
+
+<div class="container-fluid loginDiv">
+  <br>
+
+<form  [formGroup]="signUp" class="form" (ngSubmit)="onFormSubmit()" >
+  <div>
+    <div class="form-group" style="align-self:center"> 
+      <br>
+      <h3> Venda sus productos con nosotros </h3>
+      <br>
+    </div>
+    <div class="form-group" style="align-self:center">
+        <label style="font-size:16" for="inputEmail">Correo Electrónico</label>
+      <input class="form-control"  type="email"
+            id="inputEmail"
+            formControlName = "userEmail"
+          placeholder="Correo">
+       </div>
+
+    <div class="form-group" *ngIf="signUp.controls.userEmail.invalid && signUp.controls.userEmail.touched">
+      <span style="color:red"> <h6> El formato del correo es inválido  </h6> </span>
+    </div>
+
+    <div class="form-group">
+      <label style="font-size:16" for="pass">Contraseña</label>
+        <input class="form-control"  type="password"
+        formControlName = "passw"
+              id="pass"
+            >
+         </div>
+
+    <div class="form-group" *ngIf="signUp.controls.passw.untouched">
+        <span style="color:red"> <h6> Debe ingresar su contraseña  </h6> </span>
+    </div>
+    <div class="form-group">
+  
+    <button type="submit" [disabled] = "!signUp.valid" class="btn btn-primary">Ingresar</button>
+    </div>
+
+    <div class="form-group">
+      <h6>¿No tienes una cuenta? <a class="enterpriseLink" style="color:blue;" [routerLink]="[ {outlets: {'login': ['registerEnterprise']}}]"
+        > Registrarme ahora </a></h6>
+    </div>
+
+    <div class="form-group">
+        <a class="enterpriseLink" > <h6> Olvidé mi contraseña </h6> </a>
+  </div>
+</div>
+</form>
+
+</div>

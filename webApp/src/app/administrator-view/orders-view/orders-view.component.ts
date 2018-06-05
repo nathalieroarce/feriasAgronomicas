@@ -18,7 +18,7 @@ export class OrdersViewComponent implements OnInit {
   private typeOfAction: Boolean;
   private loadingOrders:Boolean;
   private filters: Array<any>;
-  private currentItem: boolean;
+  private currentItem: String;
   private enterpriseID: Number;
   private clientDeliveryDate: Date;
   private justification:String;
@@ -27,8 +27,8 @@ export class OrdersViewComponent implements OnInit {
 
   constructor(private orders : OrdersService) {
     this.userNotify= new userNotifications(); 
-    this.filters= [{"text":"Pedidos no atendidos","value": false},{"text":"Pedidos enviados","value": true}]
-    this.currentItem= this.filters[0].value;
+    this.filters= [{"text":"Pedidos no atendidos","request":"getPendingOrders" },{"text":"Pedidos enviados","request":"getSentOrders"},{"text":"Pedidos pagados","request": "getPaidOrders"}]
+    this.currentItem= this.filters[0].request;
     this.enterpriseID=1;
     this.loadOrders();
     
@@ -36,20 +36,16 @@ export class OrdersViewComponent implements OnInit {
   }
 
   public loadOrders(){
-    
-    if (this.currentItem== true){
-      this.orders.getOrders("getSentOrders",this.enterpriseID).then();
-      
-    }
-
-    else{
-      this.orders.getOrders("getPendingOrders",this.enterpriseID).then();
-    }
+    this.orders.getOrders(this.currentItem,this.enterpriseID).then();
   }
 
   public setAction(orderId:Number,action:Boolean){
     this.orderID=orderId;
     this.typeOfAction= action;
+  }
+
+  public markAsPaid(orderID: Number){
+    alert("marcar como pagado");
   }
 
   public sendOrder(){

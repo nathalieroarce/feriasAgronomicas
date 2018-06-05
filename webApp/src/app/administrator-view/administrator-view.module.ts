@@ -17,7 +17,7 @@ const routes: Routes = [
     {path: 'orders', component: OrdersViewComponent, outlet:'administrator'},
     {path: 'enterpriseInformation', component: EnterpriseProfileComponent, outlet:'administrator'}
     ]}
- // { path: 'registerProduct', component: ProductsRegistrationComponent}
+    
 ];
 
 

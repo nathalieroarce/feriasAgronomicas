@@ -195,6 +195,19 @@ app.get('/getProductsTypes', async (req, res) => {
 
 */
 
+
+app.get('/doLogin',function(req,res){
+	db.func('sp_doLogin',[req.query.enterpriseEmail, req.query.enterprisePassword])
+		.then(data => {
+			console.log(data);
+			res.end(JSON.stringify({response:true, "data": data } ) );
+			})
+		  .catch(error=> {
+		    console.log("ERROR: ",error);
+		    res.end(JSON.stringify({ response:false,"data":[]}));})
+})
+
+
 app.post('/registerProduct',function(req,res)
 {
 	
@@ -342,7 +355,6 @@ app.get('/getEnterprises',function(req,res)
 
 
 
-
 app.get('/getProductsByKey',function(req,res)
 {
 	db.func('sp_getProductsByKey',[req.query.key,req.query.enterpriseID])
@@ -382,6 +394,34 @@ app.get('/getSentOrders',function(req,res)
 		    res.end(JSON.stringify({ response:false,"data":[]}));})
 
 });
+
+app.get('/getPaidOrders',function(req,res)
+{
+	db.func('sp_getPaidOrders',[req.query.enterpriseID])
+		.then(data => {
+			console.log(data);
+			res.end(JSON.stringify({response:true, "data": data } ) );
+			})
+		  .catch(error=> {
+		    console.log("ERROR: ",error);
+		    res.end(JSON.stringify({ response:false,"data":[]}));})
+
+});
+
+
+app.post('/setPaid',function(req,res){
+
+	db.func('sp_setPaid',[req.body.orderID])
+		.then(data => {
+			console.log(data);
+			res.end(JSON.stringify({response:data[0].sp_setpaid} ) );
+			})
+		  .catch(error=> {
+		    console.log("ERROR: ",error);
+		    res.end(JSON.stringify({ response:false}));})
+	})
+
+
 
 app.post('/sendOrder',function(req,res)
 {
