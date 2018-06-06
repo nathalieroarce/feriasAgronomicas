@@ -23,25 +23,25 @@ export class OrdersService {
   private url= globalVars.apiUrl;
   public results:  Array<orderItem>;
 
-  constructor(private http:Http) { 
+  constructor(private http:Http) {
     this.results=new Array<orderItem>();
   }
 
   /**
-   * 
+   *
    * @param orderID : id of the order to be deleted
    * @param list : order list
    */
   public deleteFromOrder(orderID: Number): Boolean {
 
-    let size= this.results.length;
+    let size = this.results.length;
     for (let index = 0; index < size; index++) {
       if (this.results[index].orderID===orderID){
-        this.results.splice(index,1);  
+        this.results.splice(index,1);
         return true;
-        
+
       }
-      
+
     }
 
     return false;
@@ -76,7 +76,7 @@ export class OrdersService {
     }
 
   public cancelOrder(orderID:Number, justification: String){
-    
+
     let headers = new Headers({"Content-Type": "application/json"});
     let options = new RequestOptions({headers: headers});
 
@@ -86,7 +86,7 @@ export class OrdersService {
           .toPromise()
           .then(
               res => { // Success
-               
+
                 resolve(res.json().response); //notify that the process was successful
               },
               msg => { // Error
@@ -98,7 +98,7 @@ export class OrdersService {
   }
 
   public sendOrder(orderID:Number, deliveryDate:Date){
-  
+
     let headers = new Headers({"Content-Type": "application/json"});
     let options = new RequestOptions({headers: headers});
 
