@@ -4,17 +4,17 @@
     <br>
     <div class="radio" style="display:inline-block;"  *ngFor="let item of filters">
         <label>
-          <input type="radio" style="margin-left:12px;" (change)="loadOrders()"  name="item" [(ngModel)]="currentItem" [value]="item.value" [checked]="item===currentItem"> 
+          <input type="radio" style="margin-left:12px;" (change)="loadOrders()"  name="item" [(ngModel)]="currentItem" [value]="item.value" [checked]="item===currentItem">
           {{ item.text}}
         </label>
     </div>
     <div *ngIf="loadingOrders" class="form-group">
         <img  class="icon" width="50" height="50"  src="../../../assets/Images/uploading2.gif" alt="">
-        <span> Cargando pedidos ... </span>               
+        <span> Cargando pedidos ... </span>
     </div>
-    
+
 <div class="table-responsive">
-    
+
     <table id="ordersTable" class="table table-hover">
        <thead class="thead-dark">
          <tr>
@@ -27,46 +27,83 @@
          </tr>
 
        </thead>
-
-       <tr *ngFor="let order of orders.results">
-          <td> {{ order.direction}} </td>
-          <td> {{ order.orderDate}} </td>
-          <td> <label *ngIf="order.expressService===true; else noRequerido">Sí</label>
-            <ng-template #noRequerido>
-             <label>No</label>
-            </ng-template>
-         </td>
-          <td> {{order.totalAmount }} </td>
-          <td> {{order.observations}}</td>
-          <td *ngIf="currentItem===false"> 
-              <div class="btn-group" role="group">
-                  <button type="button" (click)="setAction(order.orderID,true)" class="btn btn-secondary"
-                  data-toggle="modal" data-target="#orderActionModal" >Enviar</button>
-                  <button type="button" (click)="setAction(order.orderID,false)" class="btn btn-secondary"
-                  data-toggle="modal" data-target="#orderActionModal">Rechazar</button>
-                </div>
-          </td>
-          
-          
-       </tr>
+      <tbody (click)="showProducts(order)"  data-toggle="modal" data-target="#productActionModal">
+        <tr *ngFor="let order of orders.results">
+            <td> {{ order.direction}} </td>
+            <td> {{ order.orderDate}} </td>
+            <td> <label *ngIf="order.expressService===true; else noRequerido">Sí</label>
+              <ng-template #noRequerido>
+               <label>No</label>
+              </ng-template>
+           </td>
+            <td> {{order.totalAmount }} </td>
+            <td> {{order.observations}}</td>
+            <td *ngIf="currentItem===false">
+                <div class="btn-group" role="group">
+                    <button type="button" (click)="setAction(order.orderID,true)" class="btn btn-secondary"
+                    data-toggle="modal" data-target="#orderActionModal" >Enviar</button>
+                    <button type="button" (click)="setAction(order.orderID,false)" class="btn btn-secondary"
+                    data-toggle="modal" data-target="#orderActionModal">Rechazar</button>
+                  </div>
+            </td>
+         </tr>
+      </tbody>
       </table>
 
 </div>
 
 
+  <div class="modal fade" id="productActionModal" tabindex="-1" role="dialog" aria-labelledby="ActionModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+            <h5>
+              Productos del pédido
+            </h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
 
-<!-- Modal -->
+          <table id="productsOrderTable" class="table table-hover">
+            <thead class="thead-dark">
+            <tr>
+              <th scope="col"> Nombre del producto</th>
+              <th scope="col"> Precio</th>
+              <th scope="col"> Cantidad solicitada</th>
+            </tr>
+
+            </thead>
+            <tbody>
+            <tr *ngFor="let productOrder of productsOrder">
+              <td> {{ productOrder.name}} </td>
+              <td> {{ productOrder.price}} </td>
+              <td> {{productOrder.totalAmount }} </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+ <!-- Modal -->
 <div class="modal fade" id="orderActionModal" tabindex="-1" role="dialog" aria-labelledby="ActionModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
           <h5 *ngIf="typeOfAction===true; else cancel" class="modal-title" id="ActionModalLabel">
-               Confirmación del envío  
+               Confirmación del envío
           </h5>
           <ng-template #cancel >
               <h5  class="modal-title" id="ActionModalLabel"> Rechazo de pedido </h5>
           </ng-template>
-          
+
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -80,7 +117,7 @@
           <ng-template #cancelOrder >
                 <div class="form-group">
                         <label for="justification">Ingrese la razón por la que el pedido será rechazado </label>
-                        <input type="text" [ngModelOptions]="{standalone: true}" 
+                        <input type="text" [ngModelOptions]="{standalone: true}"
                         [(ngModel)]="justification" class="form-control" id="justification">
                   </div>
           </ng-template>
@@ -89,10 +126,12 @@
 
           <button *ngIf="typeOfAction===false" type="button" (mousedown)="cancelEnterpriseOrder()" class="btn btn-secondary" data-dismiss="modal"> Confirmar rechazo </button>
           <button *ngIf="typeOfAction===true" type="button" (click)="sendOrder()" class="btn btn-secondary" data-dismiss="modal"> Confirmar envío </button>
-          
+
 
           <button type="button" class="btn btn-primary" data-dismiss="modal" >Cancelar</button>
         </div>
       </div>
     </div>
-  </div>
+</div>
+
+</div>
