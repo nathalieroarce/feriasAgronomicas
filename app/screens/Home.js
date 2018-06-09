@@ -1,13 +1,15 @@
 import React, { Component } from 'react';
-import {View, Modal ,Button,Text,StyleSheet,TouchableHighlight,Image, FlatList} from 'react-native';
+import {View, Modal ,Button,Text,StyleSheet,SectionList,TouchableHighlight,Image, FlatList} from 'react-native';
 import { SearchBar, Header, Icon } from 'react-native-elements';
 import {MaterialIcons} from 'react-native-vector-icons';
 import { createStackNavigator } from 'react-navigation';
+
+import PopupDialog, { DialogTitle } from 'react-native-popup-dialog';
+import NumericInput,{ calcSize } from 'react-native-numeric-input';
+
 import Product from './components/Product';
 import Enterprise from './components/Enterprise';
 import EnterpriseProduct from './components/EnterpriseProduct';
-import PopupDialog, { DialogTitle } from 'react-native-popup-dialog';
-import NumericInput,{ calcSize } from 'react-native-numeric-input';
 
 var styles = require('./styles');
 var services = require('./services');
@@ -27,7 +29,6 @@ var E_Product = class
      this.productQuantity= quantity;
   }
 }
-
 
 var CartEnterprise = class
 {
@@ -57,6 +58,20 @@ var CartEnterprise = class
     this.data.push(new E_Product(newProduct, quantity));
     return;
   }
+
+  deleteProduct(prod)
+  {
+    var j;
+    for(j=0; j<this.data.length; j++)
+    {
+      if(this.data[j].o_id== prod.o_id)
+      {
+        this.data.splice(j, 1);
+        return;
+      }
+    }
+    return;
+  }
 }
 
 var Cart = class
@@ -80,11 +95,32 @@ var Cart = class
     this.enterprises.push(new CartEnterprise(newProduct.o_enterpriseid, newProduct.o_enterprisename, new E_Product(newProduct, quantity)));
     return;
   }
+
+  deleteFromCart(prod)
+  {
+    var idEnterprise = prod.o_enterpriseid;
+
+    var i;
+    for(i=0; i<this.enterprises.length; i++)
+    {
+      if(this.enterprises[i].id== idEnterprise)
+      {
+        if(this.enterprises[i].data.length==1)
+        {
+          this.enterprises.splice(i, 1);
+          return;
+        }
+        return this.enterprises[i].deleteProduct(prod);
+      }
+    }
+    return;
+  }
 }
 
 
-export class Home extends Component
-{
+
+
+export class Home extends Component{
   state = {
     dataType : 'none',
     enterpriseId: '-1',
@@ -95,14 +131,6 @@ export class Home extends Component
     productQuantity: 0,
     modalVisible: false
   };
-
-  addTocart = ()=>
-  {
-
-  }
-
-
-
 
   handleSearch = () => {
     if(this.state.enterprisesId !== '-1'&& this.state.soughtValue === 'none')
@@ -133,58 +161,75 @@ export class Home extends Component
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   render()
   {
     return (
       <View style={styles.appContainer}>
+        <Modal
+           animationType="slide"
+           transparent={false}
+           visible={this.state.modalVisible}
+           onRequestClose={() => { alert('Modal has been closed.');}}>
+           <View style = {styles.appContainer}>
+           <Header style={{backgroundColor:'#4B610B'}}
+             leftComponent={{ icon: 'chevron-left', color: '#fff', onPress:() => {this.setState({modalVisible:false})}}}
+             centerComponent={{ text: 'Mi carrito', style:styles.title }}
+           />
+
+           <SectionList
+             sections={this.state.cart.enterprises}
+             renderItem={({item}) =>
+               <View style={styles.row}>
+                 <Image source={{ uri: item.o_image }} style={styles.image} />
+                 <View style={styles.rowContent}>
+                   <Text style={styles.rowTitle}>{item.o_name}</Text>
+                   <Text>Precio: {item.o_price} / {item.o_unit}  </Text>
+                   <Text>Cantidad: {item.productQuantity}  </Text>
+                   <Button  style={styles.button} title="Eliminar" onPress={()=>{this.state.cart.deleteFromCart(item);}}/>
+                 </View>
+               </View>}
+             renderSectionHeader={({section}) => <Text style={styles.title}>{section.name}</Text>}
+             ListFooterComponent={()=><Button  style={styles.button} title="Confirmar pedidoS" onPress={()=>{this.state.cart.deleteFromCart(item);}}/>}
+             keyExtractor={(item, index) => index.toString()}
+           />
+           </View>
+         </Modal>
+
         <PopupDialog
-        dialogTitle={ <Header centerComponent={{ text: '¿Añadir al carrito?', style: { color: '#fff' } }}  rightComponent={{ icon: 'close', color: '#fff',onPress:()=>{this.popupDialog.dismiss()}}} />}
-        ref={(popupDialog) => { this.popupDialog = popupDialog; }} >
+          dialogTitle={
+            <Header
+              centerComponent={{ text: '¿Añadir al carrito?', style: { color: '#fff' } }}
+              rightComponent={{ icon: 'close', color: '#fff',onPress:()=>{this.popupDialog.dismiss()}}} />
+          }
+          ref={
+            (popupDialog) => { this.popupDialog = popupDialog; }
+          }>
 
+            <View style={styles.rowContainer}>
+              <Image source={{ uri: this.state.selectedProduct.o_image }} style={styles.image2} />
 
-        <View style={styles.rowContainer}>
-            <Image source={{ uri: this.state.selectedProduct.o_image }} style={styles.image2} />
+              <View style={styles.rowContent}>
+                <Text style={styles.rowTitle}>{this.state.selectedProduct.o_name}</Text>
+                <Text>Empresa: {this.state.selectedProduct.o_enterprisename} </Text>
+                <Text>Precio: {this.state.selectedProduct.o_price} / {this.state.selectedProduct.o_unit}  </Text>
+                <Text>Descripción: {this.state.selectedProduct.o_description}  </Text>
+                <Text>Selecciona la cantidad</Text>
+                <NumericInput
+                value={this.state.productQuantity} onChange={value => this.setState({productQuantity:value})} totalWidth={calcSize(240)}
+                totalHeight={calcSize(50)} iconSize={calcSize(25)} step={1} valueType='real' rounded textColor='#B0228C'
+                iconStyle={{ color: 'white' }} rightButtonBackgroundColor='#EA3788' leftButtonBackgroundColor='#E56B70'/>
 
-            <View style={styles.rowContent}>
-              <Text style={styles.rowTitle}>{this.state.selectedProduct.o_name}</Text>
-              <Text>Empresa: {this.state.selectedProduct.o_enterprisename} </Text>
-              <Text>Precio: {this.state.selectedProduct.o_price} / {this.state.selectedProduct.o_unit}  </Text>
-              <Text>Descripción: {this.state.selectedProduct.o_description}  </Text>
-              <Text>Selecciona la cantidad</Text>
-              <NumericInput
-              value={this.state.productQuantity} onChange={value => this.setState({productQuantity:value})} totalWidth={calcSize(240)}
-              totalHeight={calcSize(50)} iconSize={calcSize(25)} step={1} valueType='real' rounded textColor='#B0228C'
-              iconStyle={{ color: 'white' }} rightButtonBackgroundColor='#EA3788' leftButtonBackgroundColor='#E56B70'/>
-
-              <Button  style={styles.button} title="Añadir" onPress={()=>{this.state.cart.addTocart(this.state.selectedProduct,this.state.productQuantity);console.log(this.state.cart);  this.popupDialog.dismiss()}}/>
+                <Button  style={styles.button} title="Añadir" onPress={()=>{this.state.cart.addTocart(this.state.selectedProduct,this.state.productQuantity);console.log(this.state.cart);  this.popupDialog.dismiss()}}/>
+              </View>
             </View>
-          </View>
         </PopupDialog>
 
         <Header style={{backgroundColor:'#4B610B'}}
         leftComponent = {{ icon:'menu',color:'#fff', onPress:() => console.log('hello')}}
         centerComponent={{ text: 'Ferias Agronomicas', style: { color: '#fff' } }}
-        rightComponent={{ icon: 'shopping-cart', color: '#fff',onPress:() => this.props.navigation.navigate("ShoppingCartScreen", {cart : this.state.cart})}}
+        rightComponent={{ icon: 'shopping-cart', color: '#fff',onPress:() => this.setState({modalVisible:true})}}
         />
-
         <SearchBar lightTheme round searchIcon={{ size: 24 }} onChangeText={(text) => this.handleChangeText(text)} placeholder='Buscar...' />
-
 
 
         <FlatList

@@ -310,7 +310,7 @@ BEGIN
 				INNER JOIN
 					producttypes
 				ON producttype = typeid
-			WHERE stock > 0  and (typename LIKE '%'||i_key||'%' OR lower(productname) LIKE '%'||lower(i_key)||'%')    );
+			WHERE stock > 0  and (typename LIKE '%'||i_key||'%' OR lower(productname) LIKE '%'||lower(i_key)||'%'));
 	END IF;
 END;
 $body$

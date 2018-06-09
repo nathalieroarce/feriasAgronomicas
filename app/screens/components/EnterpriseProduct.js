@@ -17,7 +17,7 @@ class EnterpriseProduct  extends Component
   {
     return(
       <TouchableOpacity style={styles.row} onPress={this.state.method}>
-        <View style={styles.rowContainer} >
+        <View style={styles.rowContainer}>
           <Image source={{ uri: this.state.item.o_image }} style={styles.image} />
           <View style={styles.rowContent}>
             <Text style={styles.rowTitle}>{this.state.item.o_name}</Text>
