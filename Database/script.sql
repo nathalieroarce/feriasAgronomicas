@@ -1,4 +1,4 @@
-/***********************************************************
+﻿/***********************************************************
 DOMAINS
 ************************************************************/
 CREATE DOMAIN t_unit CHAR(1) NOT NULL CONSTRAINT
@@ -261,7 +261,7 @@ CREATE OR REPLACE FUNCTION sp_getProductsByEnterpriseID
 	OUT o_enterpriseID INTEGER,
 	OUT o_productID INTEGER,
 	OUT o_productName TEXT,
-	OUT o_price MONEY,
+	OUT o_price int,
 	OUT o_productImage TEXT,
 	OUT o_productUnit t_unit,
 	OUT o_productDescription TEXT,
@@ -272,7 +272,7 @@ SETOF RECORD AS
 $body$
 BEGIN
 	RETURN query SELECT p.* FROM
-	(SELECT enterpriseID,productID, productName, price,image,unit,description,stock  FROM products WHERE enterpriseID=i_enterpriseID) AS p
+	(SELECT enterpriseID,productID, productName, (price::numeric::int),image,unit,description,stock  FROM products WHERE enterpriseID=i_enterpriseID) AS p
 	 WHERE p.stock > 0;
 
 END;
@@ -329,7 +329,7 @@ CREATE OR REPLACE FUNCTION sp_getProductsByType
 	IN i_enterpriseID INTEGER,
 	OUT o_ID INTEGER, 
 	OUT o_name TEXT,
-	OUT o_price Money,
+	OUT o_price int,
 	OUT o_unit t_unit,
 	OUT o_image TEXT,
 	OUT o_description TEXT,
@@ -340,8 +340,8 @@ RETURNS SETOF RECORD AS
 $body$
 BEGIN
 	RETURN query
-	SELECT p.productID, p.productName, p.price,p.unit,p.image, p.description , p.stock  FROM 
-	(SELECT productID,productName,price,unit,image, productType ,description , stock FROM products WHERE enterpriseID = i_enterpriseID AND stock > 0) AS p
+	SELECT p.productID, p.productName, (p.price::numeric::int),p.unit,p.image, p.description , p.stock  FROM 
+	(SELECT productID,productName,(price::numeric::int),unit,image, productType ,description , stock FROM products WHERE enterpriseID = i_enterpriseID AND stock > 0) AS p
 	WHERE p.productType = i_productTypeID;
 END;
 $body$
@@ -364,8 +364,7 @@ CREATE OR REPLACE FUNCTION sp_updateProductInformation
 RETURNS BOOLEAN AS
 $body$
 BEGIN
-	UPDATE products SET (productName,price,unit,image,stock,description)= (i_name,i_price,i_unit,i_image,i_stock,i_description)
-	WHERE productID= i_productID;
+	UPDATE products SET (productName, price, unit, image, stock, description)= (i_name, i_price, i_unit, i_image, i_stock, i_description) WHERE productID = i_productID;
 	RETURN TRUE;	
 	--EXCEPTION WHEN OTHERS THEN RETURN FALSE;
 END;

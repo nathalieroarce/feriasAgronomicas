@@ -34,11 +34,8 @@ export class ProductsManagementService {
       if (this.results[index].productID === productID) {
         this.results.splice(index, 1);
         return true;
-
       }
-
     }
-
     return false;
   }
 

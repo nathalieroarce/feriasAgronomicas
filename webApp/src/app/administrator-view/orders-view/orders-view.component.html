@@ -27,8 +27,8 @@
          </tr>
 
        </thead>
-      <tbody (click)="showProducts(order)"  data-toggle="modal" data-target="#productActionModal">
-        <tr *ngFor="let order of orders.results">
+      <tbody >
+        <tr *ngFor="let order of orders.results" (click)="showProducts(order)"  data-toggle="modal" data-target="#productActionModal">
             <td> {{ order.direction}} </td>
             <td> {{ order.orderDate}} </td>
             <td> <label *ngIf="order.expressService===true; else noRequerido">Sí</label>
@@ -58,7 +58,7 @@
       <div class="modal-content">
         <div class="modal-header">
             <h5>
-              Productos del pédido
+              Productos del pedido
             </h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
@@ -72,14 +72,16 @@
               <th scope="col"> Nombre del producto</th>
               <th scope="col"> Precio</th>
               <th scope="col"> Cantidad solicitada</th>
+              <th scope="col"> Total</th>
             </tr>
 
             </thead>
             <tbody>
             <tr *ngFor="let productOrder of productsOrder">
-              <td> {{ productOrder.name}} </td>
-              <td> {{ productOrder.price}} </td>
-              <td> {{productOrder.totalAmount }} </td>
+              <td> {{ productOrder.o_name}} </td>
+              <td> {{ productOrder.o_price}} </td>
+              <td> {{productOrder.o_purchasedamount }} </td>
+              <td> {{productOrder.o_totalAmount }} </td>
             </tr>
             </tbody>
           </table>

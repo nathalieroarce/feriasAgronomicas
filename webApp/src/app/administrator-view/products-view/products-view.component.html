@@ -37,6 +37,11 @@
       </tr>
     </table>
 
+    <div *ngIf="updatingProduct" >
+      <img  class="icon"  src="../../../assets/Images/uploading2.gif" alt="" style="width:30%; height:30%">
+      <span> Actualizando el producto ... </span>
+    </div>
+
   </div>
 
   <div class="modal fade" id="productActionModal" tabindex="-1" role="dialog" aria-labelledby="ActionModalLabel" aria-hidden="true">
@@ -74,11 +79,22 @@
               <input id="prodStock" class="form-control" type="text" formControlName="productStock">
             </div>
 
-            <div class="form-group">
-              <img src='' id="imageProduct" style="width: 400px; height: 264px; margin-left: auto"  formControlName="productImage">
+            <div class="image" style="margin-left: auto; margin-top: auto">
+              <img  [src]="productImage" style= "width: 400px; height: 264px; margin-left: auto">
+              <input type="file" (change)="fileChangeEvent($event)" id="imageFile">
             </div>
 
-
+            <div class="form-group">
+              <label>Modalidad de venta para el producto </label>
+              <br>
+              <br>
+              <div class="radio" style="display:inline-block;"  *ngFor="let item of saleModes">
+                <label>
+                  <input type="radio" style="margin-left:12px;" name="item" [ngModelOptions]="{standalone: true}" [(ngModel)]="productUnit" [value]="item.symbol" [checked]="item===productUnit">
+                  {{ item.description}}
+                </label>
+              </div>
+            </div>
             <div class="form-group">
             <button type="button" (click)="updateInfoProduct()" class="btn btn-secondary" data-dismiss="modal"> Guardar cambios </button>
             </div>

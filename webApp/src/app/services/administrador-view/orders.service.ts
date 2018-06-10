@@ -75,6 +75,26 @@ export class OrdersService {
       return promise;
     }
 
+
+  public getProductOrders(orderID:Number){
+
+    let promise = new Promise((resolve, reject) => {
+      let apiURL = this.url+`getOrderProducts?orderID=${orderID}`;
+      this.http.get(apiURL)
+        .toPromise()
+        .then(
+          res => { // Success
+            resolve(res.json().data);
+          },
+          msg => { // Error
+            reject(msg);
+          }
+        );
+    });
+    return promise;
+  }
+
+
   public cancelOrder(orderID:Number, justification: String){
 
     let headers = new Headers({"Content-Type": "application/json"});

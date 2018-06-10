@@ -46,8 +46,11 @@ export class OrdersViewComponent implements OnInit {
   }
 
   public showProducts( order : any){
-    this.orders.
-
+   // this.productsOrder = [{o_name: "Piña", o_price: "¢3 000,00", o_purchasedamount: 5, o_totalamount: "¢15 000,00"}];
+    this.orders.getProductOrders(order.orderID).then(response =>{
+      console.log(response);
+      this.productsOrder = response;
+    });
   }
 
   public setAction(orderId:Number,action:Boolean){

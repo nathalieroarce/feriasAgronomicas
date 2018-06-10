@@ -435,7 +435,7 @@ app.get('/getProductsByType',function(req,res)
 
 app.post('/updateProductInformation',function(req,res)
 {
-	upload(req,res, function (err) {
+	upload(req, res, function (err) {
         if (err) {
         	console.log(err);
             res.end(JSON.stringify({response:false,message: "El proceso de carga de la imagen no fue exitoso"}));
@@ -444,12 +444,10 @@ app.post('/updateProductInformation',function(req,res)
 
         	if (req.file) {
         		var coverImageData = req.file.buffer;
-
-        		uploadImageToService(coverImageData,req.file.originalname, req.file.mimetype ,productsBucketName,function(error,imageUrl){
+        		uploadImageToService(coverImageData,req.file.originalname, req.file.mimetype,productsBucketName, function(error,imageUrl){
         			if (error===false){
         					//execute the store procedure
 
-        					//1 is an enterprise
         					db.func('sp_updateProductInformation',[req.body.productID, req.body.name,req.body.price,req.body.unit,imageUrl,req.body.stock,req.body.description])
 								.then(data => {
 									console.log(data);
@@ -463,7 +461,7 @@ app.post('/updateProductInformation',function(req,res)
 
         				else{
         					console.log(error);
-        					res.end(JSON.stringify({response:false,message: "El proceso de carga de la imagen no fue existoso"}));
+        					res.end(JSON.stringify({response:false, message: "El proceso de carga de la imagen no fue existoso"}));
         				}
         		});
 
@@ -475,7 +473,6 @@ app.post('/updateProductInformation',function(req,res)
 
 			}
 		}
-
     });
 	
 
