@@ -65,7 +65,7 @@ CREATE TABLE products
 );
 
 
-CREATE TABLE orders 
+CREATE TABLE orders
 (
    orderID serial NOT NULL,
    enterpriseID INTEGER NOT NULL,
@@ -85,7 +85,7 @@ CREATE TABLE orders
    --CONSTRAINT orders_FK_clientID FOREIGN KEY (clientID) REFERENCES clients(clientID) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-SELECT AddGeometryColumn('public','orders','destinationaddress', 4326, 'POINT',2); 
+SELECT AddGeometryColumn('public','orders','destinationaddress', 4326, 'POINT',2);
 
 
 CREATE TABLE orderProducts
@@ -98,7 +98,7 @@ CREATE TABLE orderProducts
    CONSTRAINT orderProducts_PK_orderID_prodcuctID PRIMARY KEY (orderID,productID),
    CONSTRAINT orderProcucts_FK_orderID FOREIGN KEY (orderID) REFERENCES orders(orderID) ON DELETE CASCADE ON UPDATE CASCADE,
    CONSTRAINT orderProcucts_FK_productID FOREIGN KEY (productID) REFERENCES products(productID) ON DELETE CASCADE ON UPDATE CASCADE
-   
+
 );
 
 
@@ -167,23 +167,23 @@ BEGIN
 	INSERT INTO enterprises (enterpriseName, logo, description, nameRepresentative, representativeCard,
 			mail, e_password, telephone, expressService, chargePerKilometer, locationName,
 			pointdeliveryorders, enterpriselocation) VALUES
-			(i_enterpriseName, i_logo, i_description, i_nameRepresentative, i_representativeCard, i_mail, 
-			md5(i_password || 'azZA'), i_telephone, i_expressService, 
+			(i_enterpriseName, i_logo, i_description, i_nameRepresentative, i_representativeCard, i_mail,
+			md5(i_password || 'azZA'), i_telephone, i_expressService,
 			(i_chargePerKilometer::MONEY), i_locationName, ST_GeomFromText(i_pointDeliveryOrders, 4326),
 			ST_GeomFromText(i_enterpriseLocation, 4326));
 	RETURN TRUE;
 	EXCEPTION WHEN OTHERS THEN RETURN FALSE;
-	
+
 END;
 $body$
 LANGUAGE plpgsql;
 
 -- Verify the existence of a enterprise
--- Require: mail and password of the enterprise 
+-- Require: mail and password of the enterprise
 -- Restrictions: None
 CREATE OR REPLACE FUNCTION sp_doLogin(
 
-	IN i_enterpriseEmail t_mail, 
+	IN i_enterpriseEmail t_mail,
 	IN i_enterprisePassword VARCHAR(10)
 )
 RETURNS
@@ -197,7 +197,7 @@ BEGIN
 		RETURN -1;
 	ELSE
 		RETURN actualEnterpriseID;
-	END IF;	
+	END IF;
 END;
 $body$
 LANGUAGE plpgsql;
@@ -206,7 +206,7 @@ LANGUAGE plpgsql;
 -- Require: enterpriseID
 -- Restrictions: If product's stock is less than 0, product information isn't going to be returned
 CREATE OR REPLACE FUNCTION sp_getEnterprises
-(	
+(
 	OUT o_enterpriceid INTEGER,
 	OUT o_enterpricename VARCHAR,
 	OUT o_logo TEXT,
@@ -261,7 +261,7 @@ CREATE OR REPLACE FUNCTION sp_getProductsByEnterpriseID
 	OUT o_enterpriseID INTEGER,
 	OUT o_productID INTEGER,
 	OUT o_productName TEXT,
-	OUT o_price int,
+	OUT o_price MONEY,
 	OUT o_productImage TEXT,
 	OUT o_productUnit t_unit,
 	OUT o_productDescription TEXT,
@@ -272,7 +272,7 @@ SETOF RECORD AS
 $body$
 BEGIN
 	RETURN query SELECT p.* FROM
-	(SELECT enterpriseID,productID, productName, (price::numeric::int),image,unit,description,stock  FROM products WHERE enterpriseID=i_enterpriseID) AS p
+	(SELECT enterpriseID,productID, productName, price,image,unit,description,stock  FROM products WHERE enterpriseID=i_enterpriseID) AS p
 	 WHERE p.stock > 0;
 
 END;
@@ -286,35 +286,39 @@ CREATE OR REPLACE FUNCTION sp_getProductsByKey
 (
 	IN  i_key TEXT,
 	IN  i_enterpriseID INTEGER,
-	
+
 	OUT o_productid INTEGER,
 	OUT o_enterpriseid INTEGER,
-	OUT o_productname TEXT,	
+	OUT o_productname TEXT,
 	OUT o_price MONEY,
 	OUT o_unit  t_unit,
 	OUT o_image TEXT,
-	OUT o_description TEXT	
+	OUT o_description TEXT
 )
 RETURNS
 SETOF RECORD AS
 $body$
 BEGIN
 	IF i_enterpriseID = -1 THEN
-		RETURN query 
-		(SELECT productid, enterpriseid, productname, price, unit, image, description FROM 
-			products 
+		RETURN query
+		(SELECT productid, enterpriseid, productname, price, unit, image, description FROM
+			products
 			INNER JOIN
-			producttypes	
+			producttypes
 			ON producttype = typeid
-			WHERE stock > 0  and (typename LIKE '%'||i_key||'%' OR productname LIKE '%'||i_key||'%')    ); 
+			WHERE stock > 0  and (typename LIKE '%'||i_key||'%' OR productname LIKE '%'||i_key||'%')    );
 	ELSE
-		RETURN query 
-		(SELECT productid, enterpriseid, productname, price, unit, image, description FROM 
-			(SELECT * FROM products WHERE enterpriseid= i_enterpriseID) as a
-			INNER JOIN
-			producttypes	
-			ON producttype = typeid
-			WHERE stock > 0  and (typename LIKE '%'||i_key||'%' OR productname LIKE '%'||i_key||'%')    ); 
+		RETURN query
+			(SELECT productid, a.enterpriseid, productname, price, unit, image, a.description,stock,enterprisename
+				FROM
+					(SELECT * FROM products WHERE enterpriseid= i_enterpriseID) as a
+				INNER JOIN
+					(SELECT * FROM enterprises where enterpriseID = i_enterpriseID ) as e
+				ON a.enterpriseid = e.enterpriseID
+				INNER JOIN
+					producttypes
+				ON producttype = typeid
+			WHERE stock > 0  and (typename LIKE '%'||i_key||'%' OR lower(productname) LIKE '%'||lower(i_key)||'%'));
 	END IF;
 END;
 $body$
@@ -327,32 +331,32 @@ CREATE OR REPLACE FUNCTION sp_getProductsByType
 (
 	IN i_productTypeID INTEGER,
 	IN i_enterpriseID INTEGER,
-	OUT o_ID INTEGER, 
+	OUT o_ID INTEGER,
 	OUT o_name TEXT,
-	OUT o_price int,
+	OUT o_price Money,
 	OUT o_unit t_unit,
 	OUT o_image TEXT,
 	OUT o_description TEXT,
 	OUT o_stock INTEGER
 )
 
-RETURNS SETOF RECORD AS 
+RETURNS SETOF RECORD AS
 $body$
 BEGIN
 	RETURN query
-	SELECT p.productID, p.productName, (p.price::numeric::int),p.unit,p.image, p.description , p.stock  FROM 
-	(SELECT productID,productName,(price::numeric::int),unit,image, productType ,description , stock FROM products WHERE enterpriseID = i_enterpriseID AND stock > 0) AS p
+	SELECT p.productID, p.productName, p.price,p.unit,p.image, p.description , p.stock  FROM
+	(SELECT productID,productName,price,unit,image, productType ,description , stock FROM products WHERE enterpriseID = i_enterpriseID AND stock > 0) AS p
 	WHERE p.productType = i_productTypeID;
 END;
 $body$
 LANGUAGE plpgsql;
 
--- Get order's product by orderID 
+-- Get order's product by orderID
 -- Require: The order id
 -- Restrictions: None
 CREATE OR REPLACE FUNCTION sp_updateProductInformation
 (
-	IN i_productID INTEGER, 
+	IN i_productID INTEGER,
 	IN i_name TEXT,
 	IN i_price INTEGER,
 	IN i_unit t_unit,
@@ -364,8 +368,9 @@ CREATE OR REPLACE FUNCTION sp_updateProductInformation
 RETURNS BOOLEAN AS
 $body$
 BEGIN
-	UPDATE products SET (productName, price, unit, image, stock, description)= (i_name, i_price, i_unit, i_image, i_stock, i_description) WHERE productID = i_productID;
-	RETURN TRUE;	
+	UPDATE products SET (productName,price,unit,image,stock,description)= (i_name,i_price,i_unit,i_image,i_stock,i_description)
+	WHERE productID= i_productID;
+	RETURN TRUE;
 	--EXCEPTION WHEN OTHERS THEN RETURN FALSE;
 END;
 $body$
@@ -374,26 +379,26 @@ LANGUAGE plpgsql;
 
 /***********************
 For table orders
-************************/	
--- Get the orders of an enterprise 
+************************/
+-- Get the orders of an enterprise
 -- Require: The enterprise id
 -- Restrictions: None
 CREATE OR REPLACE FUNCTION sp_getPendingOrders
 (
-	IN i_enterpriseID INTEGER, 
+	IN i_enterpriseID INTEGER,
 	OUT o_orderID INTEGER,
 	OUT o_expressService BOOLEAN,
 	OUT o_totalAmount MONEY,
-	OUT o_orderDate DATE, 
-	OUT o_directionName TEXT, 
-	OUT o_accepted BOOLEAN, 
+	OUT o_orderDate DATE,
+	OUT o_directionName TEXT,
+	OUT o_accepted BOOLEAN,
 	OUT o_observations TEXT
 )
-RETURNS SETOF RECORD AS 
+RETURNS SETOF RECORD AS
 $body$
 BEGIN
 	RETURN query
-	SELECT orderID, expressService, totalAmount, orderDate, directionName, accepted, observations FROM orders 
+	SELECT orderID, expressService, totalAmount, orderDate, directionName, accepted, observations FROM orders
 	WHERE enterpriseID = i_enterpriseID AND orderSent = FALSE AND accepted = TRUE
 	ORDER BY orderDate DESC;
 END;
@@ -401,32 +406,32 @@ $body$
 LANGUAGE plpgsql;
 
 
--- Get the orders that are already delivered of an enterprise 
+-- Get the orders that are already delivered of an enterprise
 -- Require: The enterprise id
 -- Restrictions: None
 CREATE OR REPLACE FUNCTION sp_getSentOrders
 (
-	IN i_enterpriseID INTEGER, 
+	IN i_enterpriseID INTEGER,
 	OUT o_orderID INTEGER,
 	OUT o_expressService BOOLEAN,
 	OUT o_totalAmount MONEY,
-	OUT o_orderDate DATE, 
-	OUT o_directionName TEXT, 
-	OUT o_accepted BOOLEAN, 
+	OUT o_orderDate DATE,
+	OUT o_directionName TEXT,
+	OUT o_accepted BOOLEAN,
 	OUT o_observations TEXT
 )
-RETURNS SETOF RECORD AS 
+RETURNS SETOF RECORD AS
 $body$
 BEGIN
 	RETURN query
-	SELECT orderID, expressService, totalAmount, orderDate, directionName, accepted, observations FROM orders 
-	WHERE enterpriseID = i_enterpriseID AND orderSent = TRUE 
+	SELECT orderID, expressService, totalAmount, orderDate, directionName, accepted, observations FROM orders
+	WHERE enterpriseID = i_enterpriseID AND orderSent = TRUE
 	ORDER BY orderDate DESC;
 END;
 $body$
 LANGUAGE plpgsql;
 
--- Check an order as sent 
+-- Check an order as sent
 -- Require: The order id and the delivery date
 -- Restrictions: None
 CREATE OR REPLACE FUNCTION sp_sendOrder
@@ -434,7 +439,7 @@ CREATE OR REPLACE FUNCTION sp_sendOrder
 	IN i_orderID INTEGER,
 	IN i_deliveryDate DATE
 )
-RETURNS BOOLEAN AS 
+RETURNS BOOLEAN AS
 $body$
 BEGIN
 	UPDATE orders SET (orderSent, deliveryDATE) = (TRUE, i_deliveryDate) WHERE orderID = i_orderID;
@@ -444,16 +449,16 @@ END;
 $body$
 LANGUAGE plpgsql;
 
--- Check an order as rejected  
+-- Check an order as rejected
 -- Require: The order id and the justification of why it was rejected
 -- Restrictions: None
 CREATE OR REPLACE FUNCTION sp_cancelOrder
 (
 	IN i_orderID INTEGER,
 	IN i_justification TEXT)
-RETURNS BOOLEAN AS 
+RETURNS BOOLEAN AS
 $body$
-DECLARE 
+DECLARE
 	d_clientID INTEGER;
 BEGIN
 	SELECT clientID INTO d_clientID FROM orders WHERE orderID = i_orderID;
@@ -465,18 +470,18 @@ END;
 $body$
 LANGUAGE plpgsql;
 
--- Get order's product by orderID 
+-- Get order's product by orderID
 -- Require: The order id
 -- Restrictions: None
 CREATE OR REPLACE FUNCTION sp_getOrderProducts
 (
-	IN i_orderID INTEGER, 
+	IN i_orderID INTEGER,
 	OUT o_name TEXT,
 	OUT o_price Money,
 	OUT o_purchasedAmount SMALLINT,
 	OUT o_totalAmount MONEY
 )
-RETURNS SETOF RECORD AS 
+RETURNS SETOF RECORD AS
 $body$
 BEGIN
 	RETURN query
@@ -488,40 +493,40 @@ $body$
 LANGUAGE plpgsql;
 
 
--- Get the orders that are already paid of an enterprise 
+-- Get the orders that are already paid of an enterprise
 -- Require: The enterprise id
 -- Restrictions: None
 CREATE OR REPLACE FUNCTION sp_getPaidOrders
 (
-	IN i_enterpriseID INTEGER, 
+	IN i_enterpriseID INTEGER,
 	OUT o_orderID INTEGER,
 	OUT o_expressService BOOLEAN,
 	OUT o_totalAmount MONEY,
-	OUT o_orderDate DATE, 
-	OUT o_directionName TEXT, 
-	OUT o_accepted BOOLEAN, 
+	OUT o_orderDate DATE,
+	OUT o_directionName TEXT,
+	OUT o_accepted BOOLEAN,
 	OUT o_observations TEXT
 )
-RETURNS SETOF RECORD AS 
+RETURNS SETOF RECORD AS
 $body$
 BEGIN
 	RETURN query
-	SELECT orderID, expressService, totalAmount, orderDate, directionName, accepted, observations FROM orders 
-	WHERE enterpriseID = i_enterpriseID AND paid = TRUE 
+	SELECT orderID, expressService, totalAmount, orderDate, directionName, accepted, observations FROM orders
+	WHERE enterpriseID = i_enterpriseID AND paid = TRUE
 	ORDER BY orderDate DESC;
 END;
 $body$
 LANGUAGE plpgsql;
 
 -- Check an order as paid
--- Require: The order id 
+-- Require: The order id
 -- Restrictions: None
 CREATE OR REPLACE FUNCTION sp_setPaid
 (
 	IN i_orderID INTEGER,
 	IN i_deliveryDate DATE
 )
-RETURNS BOOLEAN AS 
+RETURNS BOOLEAN AS
 $body$
 BEGIN
 	UPDATE orders SET paid = TRUE WHERE orderID = i_orderID;

@@ -19,7 +19,7 @@ class Enterprise extends Component
         <View style={styles.rowContainer}>
           <Image source={{ uri: this.state.item.o_logo }} style={styles.image} />
           <View style={styles.rowContent}>
-            <Text style={styles.rowTitle}>{this.state.item.o_name}</Text>
+            <Text style={styles.rowTitle}>{this.state.item.o_enterprisename}</Text>
             <Text>{this.state.item.o_locationname} </Text>
           </View>
         </View>

@@ -1,3 +1,5 @@
+// This is the product component.
+
 import React, { Component } from 'react';
 import {View, Image, TouchableOpacity,Text} from 'react-native';
 import { createStackNavigator } from 'react-navigation';
