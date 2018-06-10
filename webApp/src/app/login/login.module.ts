@@ -15,7 +15,7 @@ const routes: Routes = [
   { path: 'login', component: LoginMainViewComponent, children: [
     { path: '', component: LoginViewComponent , outlet:'login'},
     { path: 'registerEnterprise', component: EnterpriseRegistrationComponent, outlet:'login'}
-  ]}
+  ]},
 ];
 
 @NgModule({

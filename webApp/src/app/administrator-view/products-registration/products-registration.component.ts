@@ -17,17 +17,19 @@ declare var swal:any;
 export class ProductsRegistrationComponent implements OnInit {
 
 
-  private registeringProduct:Boolean;
-  private saleModes:any;
-  private currentItem:String;
-  private selectedType: any;
-  private productTypes:any;
-  private productImage: File;
-  private checker: generalChecker;
-  private userNotify: userNotifications;
+  registeringProduct:Boolean;
+  saleModes:any;
+  currentItem:String;
+  selectedType: any;
+  productTypes:any;
+  productImage: File;
+  checker: generalChecker;
+  userNotify: userNotifications;
+  enterpriseID:Number;
 
-  constructor(private productsService:ProductsManagementService) {
+  constructor(public productsService:ProductsManagementService) {
     this.userNotify= new userNotifications(); 
+    this.enterpriseID= JSON.parse(localStorage.getItem("enterpriseID")).ID;
     this.registeringProduct=false;
     this.checker= new generalChecker();
     this.saleModes=globalsVars.saleModes;
@@ -62,7 +64,7 @@ export class ProductsRegistrationComponent implements OnInit {
           maybe you can get it through local storage
         */
     let array: Array<any>=[
-      1,
+      this.enterpriseID,
       (document.getElementById("nam") as HTMLInputElement).value,
       (document.getElementById("desc") as HTMLInputElement).value,
       (document.getElementById("cod") as HTMLInputElement).value,
@@ -83,7 +85,7 @@ export class ProductsRegistrationComponent implements OnInit {
               this.resetForm();
             }
             else{
-              this.userNotify.notify(1,res.message, "Notificación del sistema");
+              this.userNotify.notify(1,"Ocurrió un error en el proceso de registro del producto", "Notificación del sistema");
             }
             this.registeringProduct=false;
           },

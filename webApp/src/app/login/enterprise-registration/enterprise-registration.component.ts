@@ -19,21 +19,21 @@ declare var google:any;
   styleUrls: ['./enterprise-registration.component.css']
 })
 export class EnterpriseRegistrationComponent implements OnInit {
-  private userNotify: userNotifications;
-  private provideExpress:Boolean;
+  userNotify: userNotifications;
+  provideExpress:Boolean;
   /**
    * coordinates x,y
    * x= latitude, y= longitud
    */
-  private checker: generalChecker;
-  private enterpriseLocation:Array<Number>;
-  private enterpriseDeliveryPointLocation: Array<Number>;
-  private enterpriseLocationName:String;
-  private registeringEnterprise: Boolean;
-  private enterpriseImage: File;
-  private pricePerKM:Number;
+  checker: generalChecker;
+  enterpriseLocation:Array<Number>;
+  enterpriseDeliveryPointLocation: Array<Number>;
+  enterpriseLocationName:String;
+  registeringEnterprise: Boolean;
+  enterpriseImage: File;
+  pricePerKM:Number;
 
-  constructor(private enterpriseRegistrationService: EnterpriseRegistrationService) {
+  constructor(public enterpriseRegistrationService: EnterpriseRegistrationService) {
     this.checker= new generalChecker();
     this.pricePerKM=0;
     this.registeringEnterprise=false;
@@ -76,6 +76,12 @@ export class EnterpriseRegistrationComponent implements OnInit {
         (document.getElementById("pass") as HTMLInputElement).value){
           this.userNotify.notify(1,"Las contraseñas no coinciden","Notificación del sistema");
           return;
+    }
+
+    let passwordSize= (document.getElementById("passw") as HTMLInputElement).value.length;
+    if (passwordSize < 5 || passwordSize > 10  ){
+        this.userNotify.notify(1,"La contraseña debe tener al menos cinco caracteres y máximo 10", "Notificación del sistema");
+        return;
     }
 
     let array: Array<any>=[

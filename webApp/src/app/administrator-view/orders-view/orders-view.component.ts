@@ -15,21 +15,21 @@ export class OrdersViewComponent implements OnInit {
   /**
    * typeOfAction, false= cancel order ; true= send order
    */
-  private typeOfAction: Boolean;
-  private loadingOrders:Boolean;
-  private filters: Array<any>;
-  private currentItem: String;
-  private enterpriseID: Number;
-  private clientDeliveryDate: Date;
-  private justification:String;
-  private orderID: Number;
-  private userNotify: userNotifications;
+  typeOfAction: Boolean;
+  loadingOrders:Boolean;
+  filters: Array<any>;
+  currentItem: String;
+  enterpriseID: Number;
+  clientDeliveryDate: Date;
+  justification:String;
+  orderID: Number;
+  userNotify: userNotifications;
 
-  constructor(private orders : OrdersService) {
+  constructor(public orders : OrdersService) {
     this.userNotify= new userNotifications(); 
     this.filters= [{"text":"Pedidos no atendidos","request":"getPendingOrders" },{"text":"Pedidos enviados","request":"getSentOrders"},{"text":"Pedidos pagados","request": "getPaidOrders"}]
     this.currentItem= this.filters[0].request;
-    this.enterpriseID=1;
+    this.enterpriseID= JSON.parse(localStorage.getItem("enterpriseID")).ID;
     this.loadOrders();
     
   
@@ -45,7 +45,8 @@ export class OrdersViewComponent implements OnInit {
   }
 
   public markAsPaid(orderID: Number){
-    alert("marcar como pagado");
+    this.orders.markAsPaid(orderID);
+
   }
 
   public sendOrder(){

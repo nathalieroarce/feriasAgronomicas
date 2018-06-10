@@ -200,13 +200,12 @@ app.get('/doLogin',function(req,res){
 	db.func('sp_doLogin',[req.query.enterpriseEmail, req.query.enterprisePassword])
 		.then(data => {
 			console.log(data);
-			res.end(JSON.stringify({response:true, "data": data } ) );
+			res.end(JSON.stringify({response:true, "data": data[0].sp_dologin } ) );
 			})
 		  .catch(error=> {
 		    console.log("ERROR: ",error);
 		    res.end(JSON.stringify({ response:false,"data":[]}));})
 })
-
 
 app.post('/registerProduct',function(req,res)
 {
@@ -326,6 +325,11 @@ app.get('/getProductTypes',function(req,res)
 
 });
 
+app.get('/Error',function(req,res)
+{
+  res.end(JSON.stringify({response:false,"data":[]})); 
+});
+
 
 app.get('/getEnterpriseProducts',function(req,res)
 {
@@ -353,10 +357,9 @@ app.get('/getEnterprises',function(req,res)
 
 });
 
-
-
 app.get('/getProductsByKey',function(req,res)
 {
+  console.log(req.query.key+ " " +req.query.enterpriseID);
 	db.func('sp_getProductsByKey',[req.query.key,req.query.enterpriseID])
 		.then(data => {
 			console.log(data);
@@ -365,7 +368,6 @@ app.get('/getProductsByKey',function(req,res)
 		  .catch(error=> {
 		    console.log("ERROR: ",error);
 		    res.end(JSON.stringify({ response:false,"data":[]}));})
-
 });
 
 app.get('/getPendingOrders',function(req,res)

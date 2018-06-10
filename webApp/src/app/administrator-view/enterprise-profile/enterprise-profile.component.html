@@ -1,3 +1,55 @@
-<p>
-  enterprise-profile works!
-</p>
+<div class="container-fluid mainContainer">
+    <div class="container" style="width:80%;">
+        <h4> Perfil de la empresa </h4>
+        <div class="row">
+          <div class="col">
+              <img style="object-fit:contain;" width="100%"  height="100%"  [src]="enterpriseService.enterprise.image" alt=""> 
+          </div>
+          <div class="col">
+             <div class="mainContainer"> 
+                
+                <div class="form-group">
+                    <label for="name"><b>Nombre:</b></label>
+                    <input readonly type="text" class="form-control" id="name" [(ngModel)]="enterpriseService.enterprise.name">
+                  </div>
+                <div class="form-group">
+                      <label for="desc"><b>Descripción:</b></label>
+                      <input readonly type="text" class="form-control" id="desc" [(ngModel)]="enterpriseService.enterprise.description">
+                </div>
+
+                <div class="form-group">
+                    <label for="ub"><b>Ubicación de la empresa </b></label>
+                    <input readonly type="text" class="form-control" id="ub" [(ngModel)]="enterpriseService.enterprise.location">
+                  </div>
+
+                <div class="form-group">
+                    <label for="repr"><b>Persona Encargad@:</b></label>
+                    <input readonly type="text" class="form-control" id="repr" [(ngModel)]="enterpriseService.enterprise.representative">
+               </div>
+
+               <div class="form-group">
+                  <label for="corr"><b>Correo electrónico:</b></label>
+                  <input readonly type="text" class="form-control" id="corr" [(ngModel)]="enterpriseService.enterprise.mail">
+               </div>
+
+              <div class="form-group">
+               <label for=""><b>Teléfono:</b></label>
+                <input readonly type="text" class="form-control" id="repr" [(ngModel)]="enterpriseService.enterprise.telephone">
+               </div>
+
+             <div class="form-group">
+              <label for="repr"><b>Ofrece servicio Express:</b></label>
+              <input readonly type="text" class="form-control" id="repr" [(ngModel)]="enterpriseService.enterprise.expressService">
+            </div>
+
+           <div class="form-group">
+            <label for="priKM"><b> Tarifa por kilómetro en colones:</b></label>
+            <input readonly type="text" class="form-control" id="priKM" [(ngModel)]="enterpriseService.enterprise.chargePerKilometer">
+           </div>
+
+             </div>
+          </div>
+          
+        </div>
+    </div>
+</div>

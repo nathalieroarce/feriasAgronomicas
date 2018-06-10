@@ -22,4 +22,5 @@ describe('ProductsRegistrationComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
 });

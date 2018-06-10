@@ -32,7 +32,7 @@ export class EnterpriseRegistrationService {
     formData.append('locationName', data[11]);
 
 
-    //add the other data
+    //add headers to http request
 
     const headers = new Headers();
     headers.append('Content-Type', 'multipart/form-data');
@@ -41,6 +41,24 @@ export class EnterpriseRegistrationService {
     return this.http.post(this.url+`registerEnterprise`,formData,body)
     .map(res => 
       res.json()); 
+  }
+
+  public logIn(email, password){
+    let promise = new Promise((resolve, reject) => {
+      let apiURL = this.url+`doLogin?enterpriseEmail=${email}&enterprisePassword=${password}`;
+      this.http.get(apiURL)
+          .toPromise()
+          .then(
+              res => { // Success
+     
+                resolve(res.json().data); //notify the request response
+              },
+              msg => { // Error
+                reject(msg);
+              }
+          );
+    });
+    return promise;
   }
 
 

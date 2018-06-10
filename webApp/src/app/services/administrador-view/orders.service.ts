@@ -118,4 +118,29 @@ export class OrdersService {
     return promise;
   }
 
+  public markAsPaid (orderID){
+    let headers = new Headers({"Content-Type": "application/json"});
+    let options = new RequestOptions({headers: headers});
+
+    let promise = new Promise((resolve, reject) => {
+      let apiURL = this.url+`setPaid`;
+      this.http.post(apiURL,JSON.stringify({"orderID": orderID}),options)
+          .toPromise()
+          .then(
+              res => { // Success
+                if (res.json().response==true){
+                  this.deleteFromOrder(orderID);
+                }
+                
+                resolve(res.json().response); //notify that the process was successful
+
+              },
+              msg => { // Error
+                reject(msg);
+              }
+          );
+    });
+    return promise;
+  }
+
 }

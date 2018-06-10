@@ -1,7 +1,7 @@
 .loginDiv{
     width: 45%;
     height: 45%;
-    margin-top: 3%;
+    margin-top: 4%;
     color: black;
     background-color: gainsboro;
     opacity: 0.6;
@@ -10,9 +10,6 @@
     align-items: center;
 }
 
-.body{
-background-image: url("../../../assets/Images/login.jpg");
-}
 
 .form{
   border-color: black;
@@ -25,7 +22,7 @@ background-image: url("../../../assets/Images/login.jpg");
 }
 
 
-
   .enterpriseLink{
     cursor: pointer;
   }
+

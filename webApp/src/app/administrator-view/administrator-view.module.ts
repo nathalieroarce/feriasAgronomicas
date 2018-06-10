@@ -9,6 +9,7 @@ import { ProductsManagementService } from '../services/administrador-view/produc
 import { OrdersViewComponent } from './orders-view/orders-view.component';
 import { EnterpriseProfileComponent } from './enterprise-profile/enterprise-profile.component';
 import { OrdersService } from '../services/administrador-view/orders.service';
+import { ProfileService } from '../services/profile.service';
 
 const routes: Routes = [
   { path: 'main', component: MainViewComponent, children: [
@@ -28,6 +29,6 @@ const routes: Routes = [
     RouterModule.forChild(routes),
   ],
   declarations: [ProductsRegistrationComponent, MainViewComponent, OrdersViewComponent, EnterpriseProfileComponent],
-  providers: [ProductsManagementService, OrdersService]
+  providers: [ProductsManagementService, OrdersService, ProfileService]
 })
 export class AdministratorViewModule { }

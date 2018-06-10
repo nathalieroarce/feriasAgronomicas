@@ -3,29 +3,25 @@ import { Platform, StyleSheet, Text, View } from 'react-native';
 import {StackNavigator, DrawerNavigator} from 'react-navigation';
 import { createStackNavigator } from 'react-navigation';
 
-import Settings from './screens/ShoppingCart';
+import ShoppingCart from './screens/ShoppingCart';
 import Home from './screens/Home';
 import Login from './screens/Login';
-import SearchResults from './screens/SearchResults';
 
 
 const RootStack = createStackNavigator(
   {
     HomeScreen: Home,
     ShoppingCartScreen: ShoppingCart ,
-    LoginScreen : Login,
-    SearchResultsScreen : SearchResults
+    //LoginScreen : Login
   },
   {
-    initialRouteName: 'LoginScreen',
+    initialRouteName: 'HomeScreen',
     headerMode: 'none'
   },
 );
 
 export default class App extends Component {
   render() {
-    return (
-        <RootStack style = {{flex: 1,backgroundColor: '#000'}}/>
-    );
+    return (<RootStack style = {{flex: 1,backgroundColor: '#000'}}/>);
   };
 };

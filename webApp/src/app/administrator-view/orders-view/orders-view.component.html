@@ -23,7 +23,7 @@
            <th scope="col"> Servicio Express requerido</th>
            <th scope="col"> Monto total</th>
            <th scope="col"> Observaciones</th>
-           <th scope="col" *ngIf="currentItem != getPaidOrders"> Acción {{ currentItem }}</th>
+           <th scope="col" *ngIf="currentItem != 'getPaidOrders' "> Acción </th>
          </tr>
 
        </thead>
@@ -38,7 +38,7 @@
          </td>
           <td> {{order.totalAmount }} </td>
           <td> {{order.observations}}</td>
-          <td *ngIf="currentItem === getPendingOrders"> 
+          <td *ngIf="currentItem == 'getPendingOrders' "> 
               <div class="btn-group" role="group">
                   <button type="button" (click)="setAction(order.orderID,true)" class="btn btn-secondary"
                   data-toggle="modal" data-target="#orderActionModal" >Enviar</button>
@@ -46,7 +46,7 @@
                   data-toggle="modal" data-target="#orderActionModal">Rechazar</button>
                 </div>
           </td>
-          <td *ngIf="currentItem=== getSentOrders"> 
+          <td *ngIf="currentItem=== 'getSentOrders' "> 
                 <button type="button" (click)="markAsPaid(order.orderID)" class="btn btn-secondary">
                   Marcar como pagado </button>
             

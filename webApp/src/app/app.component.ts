@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -7,43 +8,10 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
+
+  constructor(public router:Router) {
+    this.router.navigate(["/system/login"]); 
+
+  }
   
-  private title: string = 'My first AGM project';
-  private lat: number;
-  private lng: number;
-
-  constructor(){
-    this.setCurrentPosition();
-  }
-
-  //get user current position
-  public setCurrentPosition(){
-    navigator.geolocation.getCurrentPosition((position) => {
-     
-      this.lat = position.coords.latitude;
-      this.lng = position.coords.longitude;
-      
-    });
-  }
-
-  /*
-  Only for testing
-  */
-  public isEven(num: number){
-    if ( num % 2===0){
-      return true;
-    }
-    else{
-      return false;
-    }
-  }
-
-  public changeLocation(locationEvent:any){
-    this.lat=locationEvent.coords.lat;
-    this.lng= locationEvent.coords.lng;
-      
-  }
-
-
-
 }
