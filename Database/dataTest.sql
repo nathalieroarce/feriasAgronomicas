@@ -65,3 +65,4 @@ insert into orderProducts(orderID,productID,price, purchasedAmount, totalAmount)
 
 select * from enterprises
 
+select * from clients

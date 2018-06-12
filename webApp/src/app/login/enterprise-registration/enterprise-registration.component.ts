@@ -67,7 +67,7 @@ export class EnterpriseRegistrationComponent implements OnInit {
    * Go to register the company,
    *
    */
-  public registerEnterprise(environment){
+  public registerEnterprise(environment) {
 
     
 
@@ -107,10 +107,7 @@ export class EnterpriseRegistrationComponent implements OnInit {
         
         this.enterpriseRegistrationService.registerEnterprise(this.enterpriseImage,array).subscribe(
           (res) =>{
-            console.log("¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨***********+");
-            console.log("res");
-            console.log(res);
-            console.log("¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨***********+");
+            environment.registeringEnterprise=false;
             if (res.response === true){
               this.userNotify.notify(3,"La empresa ha sido registrada", "Notificación del sistema");
               this.resetForm();
@@ -118,7 +115,7 @@ export class EnterpriseRegistrationComponent implements OnInit {
             else{
               this.userNotify.notify(1,"Ocurrió un error en el registro de la empresa", "Notificación del sistema");
             }
-            environment.registeringEnterprise=false;
+            
           },
           (err) => {
             console.log(err.json());
@@ -140,8 +137,6 @@ export class EnterpriseRegistrationComponent implements OnInit {
    *        of the place that belongs to that location
    */
   public getNameOfPosition(position: Array<any>){
-
- 
 
     var latlng = {
       lat: position[0],

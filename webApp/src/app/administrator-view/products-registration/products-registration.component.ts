@@ -38,7 +38,7 @@ export class ProductsRegistrationComponent implements OnInit {
   }
 
   /**
-   * 
+   *
   * @param event contains files that are selected
    */
   public fileChangeEvent(event){
@@ -54,7 +54,7 @@ export class ProductsRegistrationComponent implements OnInit {
     (document.getElementById("nam") as HTMLInputElement).value="";
     (document.getElementById("desc") as HTMLInputElement).value="";
     (document.getElementById("cod") as HTMLInputElement).value="";
-    (document.getElementById("pri") as HTMLInputElement).value="";   
+    (document.getElementById("pri") as HTMLInputElement).value="";
     (document.getElementById("cant") as HTMLInputElement).value="";
   }
 
@@ -70,13 +70,12 @@ export class ProductsRegistrationComponent implements OnInit {
       (document.getElementById("cod") as HTMLInputElement).value,
       this.selectedType.o_producttypeid,
       (document.getElementById("pri") as HTMLInputElement).value,
-      this.currentItem,   
+      this.currentItem,
       (document.getElementById("cant") as HTMLInputElement).value
       ]
     if (this.checker.notNullValues(array)  == true && this.productImage!= undefined)  {
         this.registeringProduct=true;
 
-       
         this.productsService.registerProduct(this.productImage,array).subscribe(
           (res) =>{
             
@@ -90,7 +89,7 @@ export class ProductsRegistrationComponent implements OnInit {
             this.registeringProduct=false;
           },
           (err) => {
-            console.log(err.json());   
+            console.log(err.json());
             this.registeringProduct=false;
           });
     }
@@ -102,14 +101,14 @@ export class ProductsRegistrationComponent implements OnInit {
   public getProductTypes(){
       this.productsService.getProductTypes().subscribe(
         (res) =>{
-    
+
           if (res.response === true){
             this.productTypes=res.data;
             this.selectedType=this.productTypes[0];
           }
         },
         (err) => {
-          console.log(err.json());   
+          console.log(err.json());
         });
   }
 

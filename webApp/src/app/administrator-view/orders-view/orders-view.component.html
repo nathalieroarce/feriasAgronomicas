@@ -4,20 +4,22 @@
     <br>
     <div class="radio" style="display:inline-block;"  *ngFor="let item of filters">
         <label>
+
           <input type="radio" style="margin-left:12px;" (change)="loadOrders()"  name="item" [(ngModel)]="currentItem" [value]="item.request" [checked]="item===currentItem"> 
           {{ item.text}}
         </label>
     </div>
     <div *ngIf="loadingOrders" class="form-group">
         <img  class="icon" width="50" height="50"  src="../../../assets/Images/uploading2.gif" alt="">
-        <span> Cargando pedidos ... </span>               
+        <span> Cargando pedidos ... </span>
     </div>
-    
+
 <div class="table-responsive">
-    
+
     <table id="ordersTable" class="table table-hover">
        <thead class="thead-dark">
          <tr>
+           <th scope="col"> Cliente </th>
            <th scope="col"> Dirección de entrega</th>
            <th scope="col"> Fecha</th>
            <th scope="col"> Servicio Express requerido</th>
@@ -28,16 +30,18 @@
 
        </thead>
 
+
        <tr *ngFor="let order of orders.results">
-          <td> {{ order.direction}} </td>
-          <td> {{ order.orderDate}} </td>
-          <td> <label *ngIf="order.expressService===true; else noRequerido">Sí</label>
+          <td (click)="showProducts(order)" data-toggle="modal" data-target="#orderActionModal"> {{ order.clientName }}</td>
+          <td (click)="showProducts(order)" data-toggle="modal" data-target="#orderActionModal"> {{ order.direction}} </td>
+          <td (click)="showProducts(order)" data-toggle="modal" data-target="#orderActionModal"> {{ order.orderDate}} </td>
+          <td (click)="showProducts(order)" data-toggle="modal" data-target="#orderActionModal"> <label *ngIf="order.expressService===true; else noRequerido">Sí</label>
             <ng-template #noRequerido>
              <label>No</label>
             </ng-template>
          </td>
-          <td> {{order.totalAmount }} </td>
-          <td> {{order.observations}}</td>
+          <td (click)="showProducts(order)" data-toggle="modal" data-target="#orderActionModal"> {{order.totalAmount }} </td>
+          <td (click)="showProducts(order)" data-toggle="modal" data-target="#orderActionModal"> {{order.observations}}</td>
           <td *ngIf="currentItem == 'getPendingOrders' "> 
               <div class="btn-group" role="group">
                   <button type="button" (click)="setAction(order.orderID,true)" class="btn btn-secondary"
@@ -46,10 +50,12 @@
                   data-toggle="modal" data-target="#orderActionModal">Rechazar</button>
                 </div>
           </td>
-          <td *ngIf="currentItem=== 'getSentOrders' "> 
-                <button type="button" (click)="markAsPaid(order.orderID)" class="btn btn-secondary">
-                  Marcar como pagado </button>
-            
+          <td *ngIf="currentItem=== 'getSentOrders' ">
+                
+              <div class="radio">
+                  <label><input type="radio" (click)="markAsPaid(order.orderID)" name="pagado"> Pagado </label>
+                </div>
+               
           </td>
           
        </tr>
@@ -57,25 +63,35 @@
 
 </div>
 
-
-
-<!-- Modal -->
+ <!-- Modal -->
 <div class="modal fade" id="orderActionModal" tabindex="-1" role="dialog" aria-labelledby="ActionModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
-        <div class="modal-header">
+        <div *ngIf="isProductsView===false" class="modal-header">
           <h5 *ngIf="typeOfAction===true; else cancel" class="modal-title" id="ActionModalLabel">
-               Confirmación del envío  
+               Confirmación del envío
           </h5>
           <ng-template #cancel >
               <h5  class="modal-title" id="ActionModalLabel"> Rechazo de pedido </h5>
           </ng-template>
-          
+
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div class="modal-body">
+
+        <!-- FOR PRODUCTS VIEW -->
+        <div *ngIf="isProductsView===true" class="modal-header">
+            <h5>
+              Productos del pedido
+            </h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+
+        <div *ngIf="isProductsView===false" class="modal-body">
           <div *ngIf="typeOfAction===true; else cancelOrder" class="form-group">
                 <label for="orderDate">Fecha de entrega del pedido </label>
                 <input type="Date"  [ngModelOptions]="{standalone: true}"
@@ -84,19 +100,46 @@
           <ng-template #cancelOrder >
                 <div class="form-group">
                         <label for="justification">Ingrese la razón por la que el pedido será rechazado </label>
-                        <input type="text" [ngModelOptions]="{standalone: true}" 
+                        <input type="text" [ngModelOptions]="{standalone: true}"
                         [(ngModel)]="justification" class="form-control" id="justification">
                   </div>
           </ng-template>
         </div>
-        <div class="modal-footer">
 
+        <!-- FOR PRODUCTS VIEW -->
+        <div *ngIf="isProductsView===true"  class="modal-body">
+
+            <table id="productsOrderTable" class="table table-hover">
+              <thead class="thead-dark">
+              <tr>
+                <th scope="col"> Nombre del producto</th>
+                <th scope="col"> Precio</th>
+                <th scope="col"> Cantidad solicitada</th>
+                <th scope="col"> Total</th>
+              </tr>
+  
+              </thead>
+              <tbody>
+              <tr *ngFor="let productOrder of productsOrder">
+                <td> {{ productOrder.o_name}} </td>
+                <td> {{ productOrder.o_price}} </td>
+                <td> {{productOrder.o_purchasedamount }} </td>
+                <td> {{productOrder.o_totalamount }} </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        
+        <div class="modal-footer">
+          <div *ngIf="isProductsView===false">
           <button *ngIf="typeOfAction===false" type="button" (mousedown)="cancelEnterpriseOrder()" class="btn btn-secondary" data-dismiss="modal"> Confirmar rechazo </button>
           <button *ngIf="typeOfAction===true" type="button" (click)="sendOrder()" class="btn btn-secondary" data-dismiss="modal"> Confirmar envío </button>
-          
+          </div>
 
-          <button type="button" class="btn btn-primary" data-dismiss="modal" >Cancelar</button>
+          <button *ngIf="isProductsView===false" type="button" class="btn btn-primary" data-dismiss="modal" >Cancelar</button>
         </div>
       </div>
     </div>
-  </div>
+</div>
+
+</div>

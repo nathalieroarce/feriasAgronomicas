@@ -31,7 +31,7 @@ export class LoginViewComponent implements OnInit {
   
     this.loginService.logIn(this.signUp.value.userEmail, this.signUp.value.passw).then
       (response =>{
-
+        
         if (response== -1){
           localStorage.setItem("enterpriseID", JSON.stringify({"ID":response}) );
           this.userNotify.notify(1,"Los datos ingresados no pertenecen a un usuario válido", "Notificación del sistema");

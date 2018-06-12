@@ -26,7 +26,10 @@ class Login extends Component
                     <TextInput onChangeText = {(text)=> {this.username = text}} style={styles.textInput}/>
                     <Text style={styles.text}> Password </Text>
                     <TextInput secureTextEntry={true} onChangeText = {(text)=> {this.password = text}} style={styles.textInput} />
-                    <Button  style={styles.button} title="Login" onPress={()=>services.getEnterprises(this.method)}/>
+                    <View style={styles.buttonYcontainer}>
+                      <Button  style={styles.button} title="Login" onPress={()=>services.getEnterprises(this.method)}/>
+                      <Button  style={styles.button} title="Registrar" onPress={()=>this.props.navigation.navigate("RegisterScreen")}/>
+                    </View>
             </ImageBackground>
         );
     }

@@ -1,6 +1,6 @@
 
 var pg = require('pg');
-var conString = "postgres://postgres:12345@localhost:5432/agriculturalfairs";
+var conString = "postgres://postgres:postgresql2017@localhost:5432/agriculturalfairs";
 var client;
 var fs = require('fs');
 var express = require('express');
@@ -42,7 +42,7 @@ var storage = multer.memoryStorage();
 var upload = multer({ storage: storage }).single('image');
 
 var pgp = require('pg-promise')();
-var cn = {host: 'localhost', port: 5432, database: 'agriculturalfairs', user: 'postgres', password: '12345'};
+var cn = {host: 'localhost', port: 5432, database: 'agriculturalfairs', user: 'postgres', password: 'postgresql2017'};
 var db = pgp(cn);
 
 
@@ -475,7 +475,7 @@ app.get('/getProductsByType',function(req,res)
 
 app.post('/updateProductInformation',function(req,res)
 {
-	upload(req,res, function (err) {
+	upload(req, res, function (err) {
         if (err) {
         	console.log(err);
             res.end(JSON.stringify({response:false,message: "El proceso de carga de la imagen no fue exitoso"}));
@@ -484,12 +484,10 @@ app.post('/updateProductInformation',function(req,res)
 
         	if (req.file) {
         		var coverImageData = req.file.buffer;
-
-        		uploadImageToService(coverImageData,req.file.originalname, req.file.mimetype ,productsBucketName,function(error,imageUrl){
+        		uploadImageToService(coverImageData,req.file.originalname, req.file.mimetype,productsBucketName, function(error,imageUrl){
         			if (error===false){
         					//execute the store procedure
 
-        					//1 is an enterprise
         					db.func('sp_updateProductInformation',[req.body.productID, req.body.name,req.body.price,req.body.unit,imageUrl,req.body.stock,req.body.description])
 								.then(data => {
 									console.log(data);
@@ -503,7 +501,7 @@ app.post('/updateProductInformation',function(req,res)
 
         				else{
         					console.log(error);
-        					res.end(JSON.stringify({response:false,message: "El proceso de carga de la imagen no fue existoso"}));
+        					res.end(JSON.stringify({response:false, message: "El proceso de carga de la imagen no fue existoso"}));
         				}
         		});
 
@@ -515,7 +513,6 @@ app.post('/updateProductInformation',function(req,res)
 
 			}
 		}
-
     });
 	
 

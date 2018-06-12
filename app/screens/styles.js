@@ -34,7 +34,7 @@ module.exports = StyleSheet.create({
   },
   button:
   {
-      backgroundColor: 'white',      
+      backgroundColor: 'white',
       marginLeft:20,
       paddingLeft:20,
   },
@@ -91,5 +91,18 @@ module.exports = StyleSheet.create({
   {
     flexDirection: 'row',
     backgroundColor: '#E6E6E6',
+  },
+  largeInput:
+  {
+    width:400, 
+    backgroundColor: 'white',
+    padding:10,
+    fontSize: 16,
+  },
+  buttonYcontainer:
+  {    
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignContent: 'center',
   }
 });

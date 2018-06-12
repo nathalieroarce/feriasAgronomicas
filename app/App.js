@@ -3,20 +3,22 @@ import { Platform, StyleSheet, Text, View } from 'react-native';
 import {StackNavigator, DrawerNavigator} from 'react-navigation';
 import { createStackNavigator } from 'react-navigation';
 
-import ShoppingCart from './screens/ShoppingCart';
 import Home from './screens/Home';
+import HomeWR from './screens/HomeWR';
 import Login from './screens/Login';
+import Register from './screens/Register';
 
 
 const RootStack = createStackNavigator(
   {
     HomeScreen: Home,
-    ShoppingCartScreen: ShoppingCart ,
-    //LoginScreen : Login
+    HomeWRScreen: HomeWR,
+    RegisterScreen: Register,
+    LoginScreen : Login
   },
   {
-    initialRouteName: 'HomeScreen',
-    headerMode: 'none'
+    initialRouteName: 'HomeWRScreen', // The fist view in the aplication.
+    headerMode: 'none',
   },
 );
 

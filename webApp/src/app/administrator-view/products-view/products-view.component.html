@@ -1,0 +1,107 @@
+<div class="container-fluid tProducts">
+  <br>
+  <h3>Visualización de productos </h3>
+  <br>
+
+  <div class="form-group">
+    <label for="type">Tipo del producto:</label>
+    <select class="form-control" id="type" [(ngModel)]="selectedType" (change)="loadProducts()" name="selectType" style="width:40%; box-shadow: darkgray; margin-left: auto;
+    margin-right: auto;">
+      <option *ngFor="let type of productTypes" [ngValue]="type">
+        {{type.o_producttypename}}
+      </option>
+    </select>
+  </div>
+
+  <div class="table-responsive">
+    <table id="productsTable" class="table table-hover">
+      <thead class="thead-dark">
+      <tr>
+        <th scope="col"> Nombre del producto</th>
+        <th scope="col"> Precio en colones</th>
+        <th scope="col"> Descripcion</th>
+        <th scope="col"> En existencia</th>
+        <th scope="col">  </th>
+      </tr>
+
+      </thead>
+      <tr *ngFor="let products of products.results">
+        <td> {{ products.name}} </td>
+        <td> {{ products.price}} </td>
+        <td> {{ products.description}} </td>
+        <td> {{ products.stock}} </td>
+        <td>
+          <button type="button" (click)="setAction(products)" class="btn btn-secondary" data-toggle="modal" data-target="#productActionModal" >Editar</button>
+        </td>
+
+      </tr>
+    </table>
+
+    <div *ngIf="updatingProduct" >
+      <img  class="icon"  src="../../../assets/Images/uploading2.gif" alt="" style="width:30%; height:30%">
+      <span> Actualizando el producto ... </span>
+    </div>
+
+  </div>
+
+  <div class="modal fade" id="productActionModal" tabindex="-1" role="dialog" aria-labelledby="ActionModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5>
+            Edición de productos
+          </h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <form [formGroup]="productForm">
+            <div class="form-group">
+
+              <label for="prodName">Ingrese el nuevo nombre del producto </label>
+              <input id="prodName" class="form-control" type="text" formControlName="productName">
+            </div>
+
+            <div class="form-group">
+              <label for="prodPrice">Ingrese el nuevo precio del producto </label>
+              <input id="prodPrice" class="form-control" type="text" formControlName="productPrice">
+            </div>
+
+            <div class="form-group">
+              <label for="prodDescrip">Ingrese la nueva descripción del producto </label>
+              <input id="prodDescrip" class="form-control" type="text" formControlName="productDescription">
+            </div>
+
+            <div class="form-group">
+              <label for="prodStock">Ingrese la nueva cantidad disponible del producto </label>
+              <input id="prodStock" class="form-control" type="text" formControlName="productStock">
+            </div>
+
+            <div class="image" style="margin-left: auto; margin-top: auto">
+              <img  [src]="productImage" style= "width: 400px; height: 264px; margin-left: auto">
+              <input type="file" (change)="fileChangeEvent($event)" id="imageFile" name="image">
+            </div>
+
+            <div class="form-group">
+              <label>Modalidad de venta para el producto </label>
+              <br>
+              <br>
+              <div class="radio" style="display:inline-block;"  *ngFor="let item of saleModes">
+                <label>
+                  <input type="radio" style="margin-left:12px;" name="item" [ngModelOptions]="{standalone: true}" [(ngModel)]="productUnit" [value]="item.symbol" [checked]="item===productUnit">
+                  {{ item.description}}
+                </label>
+              </div>
+            </div>
+            <div class="form-group">
+            <button type="button" [disabled] ="!productForm.valid" (click)="updateInfoProduct()" class="btn btn-secondary" data-dismiss="modal"> Guardar cambios </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

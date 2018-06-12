@@ -9,7 +9,8 @@ import * as globalVars from '../../../globals';
 
 
 class orderItem {
-  constructor(public orderID: Number,
+  constructor(public clientName: String,
+              public orderID: Number,
               public direction: string,
               public orderDate: Date,
               public observations: string,
@@ -23,25 +24,25 @@ export class OrdersService {
   private url= globalVars.apiUrl;
   public results:  Array<orderItem>;
 
-  constructor(private http:Http) { 
+  constructor(private http:Http) {
     this.results=new Array<orderItem>();
   }
 
   /**
-   * 
+   *
    * @param orderID : id of the order to be deleted
    * @param list : order list
    */
   public deleteFromOrder(orderID: Number): Boolean {
 
-    let size= this.results.length;
+    let size = this.results.length;
     for (let index = 0; index < size; index++) {
       if (this.results[index].orderID===orderID){
-        this.results.splice(index,1);  
+        this.results.splice(index,1);
         return true;
-        
+
       }
-      
+
     }
 
     return false;
@@ -57,6 +58,7 @@ export class OrdersService {
                 res => { // Success
                   this.results = res.json().data.map(item => {
                     return new orderItem(
+                        item.o_clientname,
                         item.o_orderid,
                         item.o_directionname,
                         item.o_orderdate.substring(0,10),
@@ -75,8 +77,28 @@ export class OrdersService {
       return promise;
     }
 
+
+  public getProductOrders(orderID:Number){
+
+    let promise = new Promise((resolve, reject) => {
+      let apiURL = this.url+`getOrderProducts?orderID=${orderID}`;
+      this.http.get(apiURL)
+        .toPromise()
+        .then(
+          res => { // Success
+            resolve(res.json().data);
+          },
+          msg => { // Error
+            reject(msg);
+          }
+        );
+    });
+    return promise;
+  }
+
+
   public cancelOrder(orderID:Number, justification: String){
-    
+
     let headers = new Headers({"Content-Type": "application/json"});
     let options = new RequestOptions({headers: headers});
 
@@ -86,7 +108,7 @@ export class OrdersService {
           .toPromise()
           .then(
               res => { // Success
-               
+
                 resolve(res.json().response); //notify that the process was successful
               },
               msg => { // Error
@@ -98,7 +120,7 @@ export class OrdersService {
   }
 
   public sendOrder(orderID:Number, deliveryDate:Date){
-  
+
     let headers = new Headers({"Content-Type": "application/json"});
     let options = new RequestOptions({headers: headers});
 

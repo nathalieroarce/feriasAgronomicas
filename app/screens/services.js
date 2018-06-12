@@ -6,7 +6,7 @@ var {
   StyleSheet,
 } = React;
 
-var ip  = '172.0.0.106';
+var ip  = 'https://ferias-agronomicas.herokuapp.com';
 
 
 var serverRequest = async (url, callback)=> {
@@ -18,7 +18,7 @@ var serverRequest = async (url, callback)=> {
     callback(data);
   })
   .catch((error) =>{
-    console.log("No estas conectado")
+    alert("Error", "Error de conexion, verifica si los datos estan activos o que la red Wi-fi este abilidata.");
   });
 };
 
@@ -29,8 +29,11 @@ var serverRequest = async (url, callback)=> {
 
 module.exports =
 {
-  getError: (callback) => {serverRequest('http://'+ip+':8081/Error', callback)},
-  getEnterprises: (callback) => {serverRequest('http://'+ip+':8081/getEnterprises', callback)},
-  getEnterpriseProducts: (enterpriseId, callback) =>  {serverRequest('http://'+ip+':8081/getEnterpriseProducts?enterpriseID='+enterpriseId, callback)},
-  getProductsByKey:(key,enterpriseId, callback) => {serverRequest('http://'+ip+':8081/getProductsByKey?key='+key+'&enterpriseID='+enterpriseId, callback)},
+  getEnterprises: (callback) => {serverRequest(ip+'/getEnterprises', callback)},
+  getEnterpriseProducts: (enterpriseId, callback) =>  {serverRequest(ip+'/getEnterpriseProducts?enterpriseID='+enterpriseId, callback)},
+  getProductsByKey:(key,enterpriseId, callback) => {serverRequest(ip+'/getProductsByKey?key='+key+'&enterpriseID='+enterpriseId, callback)},
+  doLogin: (username, password, callback) => {serverRequest(ip+'/verifyUser?username='+username+'&password='+password, callback);},
+  registerUser: (userData, callback)=> {serverRequest(ip+'/registerUser?name='+userData.name+'&phone='+userData.phone+'&email='+userData.email+'&password='+userData.password, callback)},
 }
+
+// doOrder() ..

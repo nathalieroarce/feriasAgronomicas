@@ -186,9 +186,11 @@ END;
 $body$
 LANGUAGE plpgsql;
 
--- Verify the existence of a enterprise
--- Require: mail and password of the enterprise 
+-- Get enterprise's information by id
+-- Require: enterpriseID
 -- Restrictions: None
+
+
 CREATE OR REPLACE FUNCTION sp_doLogin(
 
 	IN i_enterpriseEmail t_mail, 
@@ -210,14 +212,6 @@ END;
 $body$
 LANGUAGE plpgsql;
 
-
---register a new cliente in the aplication
--- require client name, telephone, mail and password
--- Restrictions none
-CREATE OR REPLACE FUNCTION sp_registerClient(
-
-)
-RETURN 
 
 -- Get enterprise's information by id
 -- Require: enterpriseID
@@ -262,6 +256,81 @@ BEGIN
 END;
 $body$
 LANGUAGE plpgsql;
+
+-- Verify the existence of a enterprise or a client
+-- Require: mail and password of the enterprise or client
+-- Restrictions: None
+CREATE OR REPLACE FUNCTION sp_doLogin(
+	IN i_email t_mail, 
+	IN i_password VARCHAR(10)
+)
+RETURNS
+INTEGER AS
+$body$
+DECLARE
+	actualID INTEGER;
+BEGIN
+	actualID = (SELECT enterpriseID FROM enterprises WHERE mail = i_email AND e_password = md5(i_password|| 'azZA'));
+	IF (actualID ISNULL) THEN
+		actualID = (SELECT clientID FROM clients WHERE mail = i_email AND c_password = md5(i_password|| 'azZA'));
+		IF (actualID ISNULL) THEN
+			RETURN -1;
+		ELSE
+			RETURN actualID;
+		END IF;
+	ELSE
+		RETURN actualID;
+	END IF;	
+END;
+$body$
+LANGUAGE plpgsql;
+
+/***********************
+For table clients
+************************/
+--register a new cliente in the aplication
+-- require client name, telephone, mail and password
+-- Restrictions none
+CREATE OR REPLACE FUNCTION sp_registerClient(
+	i_name VARCHAR(50),
+	i_phone t_phone,
+	i_email t_mail,
+	i_password VARCHAR(10) 
+)
+RETURNS
+BOOLEAN AS
+$body$
+BEGIN
+	INSERT INTO clients (clientName, phone, mail, c_password)
+	VALUES (i_name, i_phone, i_email, md5(i_password || 'azZA'));
+	RETURN TRUE;
+	EXCEPTION WHEN OTHERS THEN RETURN FALSE;
+
+END;
+$body$
+LANGUAGE plpgsql;
+
+-- Login a client inside the aplication
+-- require mail and password
+-- Restrictions none
+CREATE OR REPLACE FUNCTION sp_clientLogin(
+	i_email t_mail,
+	i_password VARCHAR(10),
+	OUT o_id INT,
+	OUT o_name VARCHAR(50),
+	OUT o_phone t_phone
+)
+RETURNS
+SETOF RECORD AS
+$body$
+BEGIN
+	RETURN query SELECT clientID , clientName , phone FROM clients WHERE 
+	mail = i_email AND c_password = md5 (i_password || 'azZA');
+	
+END;
+$body$
+LANGUAGE plpgsql;
+select sp_clientLogin('p@p.com','prueba123') 
 
 /***********************
 For table products
@@ -390,7 +459,7 @@ CREATE OR REPLACE FUNCTION sp_getProductsByType
 	IN i_enterpriseID INTEGER,
 	OUT o_ID INTEGER, 
 	OUT o_name TEXT,
-	OUT o_price Money,
+	OUT o_price INT,
 	OUT o_unit t_unit,
 	OUT o_image TEXT,
 	OUT o_description TEXT,
@@ -401,7 +470,7 @@ RETURNS SETOF RECORD AS
 $body$
 BEGIN
 	RETURN query
-	SELECT p.productID, p.productName, p.price,p.unit,p.image, p.description , p.stock  FROM 
+	SELECT p.productID, p.productName, p.price::NUMERIC::INT,p.unit,p.image, p.description , p.stock  FROM 
 	(SELECT productID,productName,price,unit,image, productType ,description , stock FROM products WHERE enterpriseID = i_enterpriseID AND stock > 0) AS p
 	WHERE p.productType = i_productTypeID;
 END;
@@ -425,7 +494,7 @@ CREATE OR REPLACE FUNCTION sp_updateProductInformation
 RETURNS BOOLEAN AS
 $body$
 BEGIN
-	UPDATE products SET (productName,price,unit,image,stock,description)= (i_name,i_price,i_unit,i_image,i_stock,i_description)
+	UPDATE products SET (productName, price,unit,image,stock,description)= (i_name,i_price::NUMERIC::MONEY,i_unit,i_image,i_stock,i_description)
 	WHERE productID= i_productID;
 	RETURN TRUE;	
 	--EXCEPTION WHEN OTHERS THEN RETURN FALSE;
@@ -433,9 +502,11 @@ END;
 $body$
 LANGUAGE plpgsql;
 
+
 select sp_updateProductInformation(5,'Chila',650,'K','https://storage.googleapis.com/feriasagronomicasproductos/1528486629202-0.5517115315562113.png',
 600,'Normal modificado');
 select * from products
+
 /***********************
 For table orders
 ************************/	
@@ -451,20 +522,23 @@ CREATE OR REPLACE FUNCTION sp_getPendingOrders
 	OUT o_orderDate DATE, 
 	OUT o_directionName TEXT, 
 	OUT o_accepted BOOLEAN, 
-	OUT o_observations TEXT
+	OUT o_observations TEXT,
+	OUT o_clientName VARCHAR(50)
 )
 RETURNS SETOF RECORD AS 
 $body$
 BEGIN
 	RETURN query
-	SELECT orderID, expressService, totalAmount, orderDate, directionName, accepted, observations FROM orders 
+	SELECT o.orderID,o.expressService, o.totalAmount, o.orderDate, o.directionName, o.accepted, o.observations,c.clientName 
+	FROM (SELECT  orderID, expressService, totalAmount, orderDate, directionName, accepted, observations,clientID FROM orders 
 	WHERE enterpriseID = i_enterpriseID AND orderSent = FALSE AND accepted = TRUE
+	) AS o
+	INNER JOIN 
+	clients AS c ON c.clientID=o.clientID 
 	ORDER BY orderDate DESC;
 END;
 $body$
 LANGUAGE plpgsql;
-
-
 
 -- Get the orders that are already delivered of an enterprise 
 -- Require: The enterprise id
@@ -478,20 +552,25 @@ CREATE OR REPLACE FUNCTION sp_getSentOrders
 	OUT o_orderDate DATE, 
 	OUT o_directionName TEXT, 
 	OUT o_accepted BOOLEAN, 
-	OUT o_observations TEXT
+	OUT o_observations TEXT,
+	OUT o_clientName VARCHAR(50)
 )
 RETURNS SETOF RECORD AS 
 $body$
 BEGIN
+
 	RETURN query
-	SELECT orderID, expressService, totalAmount, orderDate, directionName, accepted, observations FROM orders 
+	SELECT o.orderID,o.expressService, o.totalAmount, o.orderDate, o.directionName, o.accepted, o.observations,c.clientName 
+	FROM (SELECT  orderID, expressService, totalAmount, orderDate, directionName, accepted, observations,clientID FROM orders 
 	WHERE enterpriseID = i_enterpriseID AND orderSent = TRUE AND paid=FALSE 
+	) AS o
+	INNER JOIN 
+	clients AS c ON c.clientID=o.clientID 
 	ORDER BY orderDate DESC;
+	
 END;
 $body$
 LANGUAGE plpgsql;
-
-
 
 -- Check an order as sent 
 -- Require: The order id and the delivery date
@@ -554,9 +633,11 @@ END;
 $body$
 LANGUAGE plpgsql;
 
+
 -- Get the orders that are already paid of an enterprise 
 -- Require: The enterprise id
 -- Restrictions: None
+
 CREATE OR REPLACE FUNCTION sp_getPaidOrders
 (
 	IN i_enterpriseID INTEGER, 
@@ -566,19 +647,24 @@ CREATE OR REPLACE FUNCTION sp_getPaidOrders
 	OUT o_orderDate DATE, 
 	OUT o_directionName TEXT, 
 	OUT o_accepted BOOLEAN, 
-	OUT o_observations TEXT
+	OUT o_observations TEXT,
+	OUT o_clientName VARCHAR(50)
 )
 RETURNS SETOF RECORD AS 
 $body$
 BEGIN
 	RETURN query
-	SELECT orderID, expressService, totalAmount, orderDate, directionName, accepted, observations FROM orders 
-	WHERE enterpriseID = i_enterpriseID AND paid = TRUE 
+	SELECT o.orderID,o.expressService, o.totalAmount, o.orderDate, o.directionName, o.accepted, o.observations,c.clientName 
+	FROM (SELECT  orderID, expressService, totalAmount, orderDate, directionName, accepted, observations,clientID FROM orders 
+	WHERE enterpriseID = i_enterpriseID AND paid = TRUE  
+	) AS o
+	INNER JOIN 
+	clients AS c ON c.clientID=o.clientID 
 	ORDER BY orderDate DESC;
+	
 END;
 $body$
 LANGUAGE plpgsql;
-
 
 
 -- Check an order as paid
@@ -593,6 +679,65 @@ $body$
 BEGIN
 	UPDATE orders SET paid = TRUE WHERE orderID = i_orderID;
 	RETURN TRUE;
+	EXCEPTION WHEN OTHERS THEN RETURN FALSE;
+END;
+$body$
+LANGUAGE plpgsql;
+
+-- Register an order 
+-- Require: The client id, enterprise id, if an expressService, total amount, direccion name, observation and destination address 
+-- Restrictions: None
+CREATE OR REPLACE FUNCTION sp_registerOrder
+( 
+	IN i_clientID INT, 
+	IN i_enterpriseID INT, 
+	IN i_expressService Boolean,
+	IN i_totalAmount INT,
+	IN i_directionName TEXT,
+	IN i_observations TEXT, 
+	IN i_destinationAddress TEXT 
+)
+RETURNS
+INTEGER AS
+$body$
+DECLARE
+        v_directionName TEXT;
+
+BEGIN
+
+	IF (i_expressService = FALSE) THEN
+		v_directionName=(SELECT locationName FROM enterprises WHERE enterpriseID= i_enterpriseID)|| chr(10) || 'Tu dirección de entrega';
+	ELSE
+		v_directionName= i_directionName;
+	END IF;
+	INSERT INTO orders (enterpriseID, clientID, expressService, totalAmount, directionName, observations, destinationaddress) 
+	VALUES (i_enterpriseID, i_clientID, i_expressService, i_totalAmount::MONEY, v_directionName, i_observations, null);
+	
+	--VALUES (i_enterpriseID, i_clientID, i_expressService, i_totalAmount::MONEY, i_directionName, i_observations, ST_GeomFromText(i_destinationaddress, 4326));
+	RETURN  currval('orders_orderid_seq');
+	EXCEPTION WHEN OTHERS THEN RETURN -1;
+END;
+$body$
+LANGUAGE plpgsql;
+
+-- Register a product of an order 
+-- Require: The order id, product id, purchased amount, unit price, total price  
+-- Restrictions: None
+CREATE OR REPLACE FUNCTION sp_registerOrderProduct
+( 
+	IN i_orderID INT, 
+	IN i_productID INT,
+	IN i_purchasedAmount INT,
+	IN i_unitPrice INT, 
+	IN i_totalPrice INT
+)
+RETURNS
+BOOLEAN AS
+$body$
+BEGIN
+	INSERT INTO orderProducts (orderID, productID, price, purchasedAmount, totalAmount) 
+	VALUES (i_orderID, i_productID, i_unitPrice::MONEY, i_purchasedAmount, i_totalPrice);
+	RETURN  TRUE;
 	EXCEPTION WHEN OTHERS THEN RETURN FALSE;
 END;
 $body$
